@@ -1,0 +1,1597 @@
+{% extends 'collaboration/base.html' %}
+
+{% block title %}{{ board.title }} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 포스트 색상 클래스 - Gemini 스타일 파스텔톤 */
+    .post-yellow {
+        background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+        border: 1px solid #fff176;
+    }
+    .post-blue {
+        background: linear-gradient(135deg, #c5e1f5 0%, #90caf9 100%);
+        border: 1px solid #64b5f6;
+    }
+    .post-green {
+        background: linear-gradient(135deg, #c8e6c9 0%, #81c784 100%);
+        border: 1px solid #66bb6a;
+    }
+    .post-pink {
+        background: linear-gradient(135deg, #f8bbd0 0%, #f48fb1 100%);
+        border: 1px solid #f06292;
+    }
+    .post-purple {
+        background: linear-gradient(135deg, #e1bee7 0%, #ce93d8 100%);
+        border: 1px solid #ba68c8;
+    }
+    .post-orange {
+        background: linear-gradient(135deg, #ffe0b2 0%, #ffcc80 100%);
+        border: 1px solid #ffb74d;
+    }
+    .post-cyan {
+        background: linear-gradient(135deg, #b2ebf2 0%, #80deea 100%);
+        border: 1px solid #4dd0e1;
+    }
+    .post-lime {
+        background: linear-gradient(135deg, #f0f4c3 0%, #dce775 100%);
+        border: 1px solid #cddc39;
+    }
+    .post-indigo {
+        background: linear-gradient(135deg, #c5cae9 0%, #9fa8da 100%);
+        border: 1px solid #7986cb;
+    }
+    .post-teal {
+        background: linear-gradient(135deg, #b2dfdb 0%, #80cbc4 100%);
+        border: 1px solid #4db6ac;
+    }
+    
+    /* 사이드바 고정 */
+    .sidebar {
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+    }
+    
+    /* 캔버스 영역 */
+    .gemini-canvas {
+        position: relative;
+        min-height: 500px;
+        width: 100%;
+        z-index: 1;
+        background: 
+            radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-position: 0 0, 10px 10px;
+        border-radius: 12px;
+    }
+    
+    /* 사이드바 스타일 개선 */
+    .sidebar {
+        background: rgba(30, 30, 30, 0.95);
+        border-radius: 12px;
+        padding: 15px;
+        color: white;
+    }
+    
+    .sidebar-logo {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .sidebar-logo .logo-icon {
+        width: 28px;
+        height: 28px;
+        background: white;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1a1a1a;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    
+    .sidebar-section-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* 색상 팔레트 스타일 - 확대된 디자인 */
+    .color-palette {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.4rem;
+        margin-bottom: 20px;
+    }
+    
+    .color-item,
+    .draggable-source {
+        width: 100%;
+        max-width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        cursor: grab;
+        transition: all 0.2s ease;
+        /* 드래그 필수 속성 */
+        touch-action: none !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        touch-action: none !important;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .color-item.dragging,
+    .draggable-source.dragging {
+        opacity: 0.5; /* 원본은 반투명하게 */
+        transition: none !important; /* 드래그 중 애니메이션 제거 */
+    }
+    
+    /* 드래그 중인 복제본(프록시) 스타일 */
+    .dragging-proxy {
+        position: fixed; /* 화면 기준 절대 위치 */
+        width: 200px;    /* 큼직한 사이즈 */
+        height: 160px;
+        z-index: 99999 !important;   /* 매우 높은 z-index로 가림 현상 방지 */
+        pointer-events: none !important; /* [핵심] 마우스 이벤트를 통과시킴 - !important로 확실하게 적용 */
+        opacity: 0.8 !important; /* 반투명 효과 */
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        transform: translate(-50%, -50%) rotate(5deg) !important; /* 마우스 중앙 정렬 + 약간 회전 */
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: #555;
+        transition: none !important; /* [핵심] 애니메이션 제거 - 딜레이 없이 즉시 반응 */
+        will-change: left, top; /* 브라우저 그래픽 가속 유도 */
+    }
+    
+    .color-item i {
+        font-size: 1.5rem; /* 아이콘 크기 확대 */
+        color: rgba(0, 0, 0, 0.4);
+        opacity: 0.7;
+        pointer-events: none;
+        user-select: none;
+    }
+    
+    .color-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .color-item:active {
+        cursor: grabbing;
+        transform: translateY(0);
+    }
+    
+    .color-item.dragging {
+        opacity: 0.6;
+        transform: scale(0.95);
+    }
+    
+    /* 색상 팔레트 아이템 색상 */
+    .color-yellow {
+        background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+        border: 2px solid #fff176;
+    }
+    .color-blue {
+        background: linear-gradient(135deg, #c5e1f5 0%, #90caf9 100%);
+        border: 2px solid #64b5f6;
+    }
+    .color-green {
+        background: linear-gradient(135deg, #c8e6c9 0%, #81c784 100%);
+        border: 2px solid #66bb6a;
+    }
+    .color-pink {
+        background: linear-gradient(135deg, #f8bbd0 0%, #f48fb1 100%);
+        border: 2px solid #f06292;
+    }
+    .color-purple {
+        background: linear-gradient(135deg, #e1bee7 0%, #ce93d8 100%);
+        border: 2px solid #ba68c8;
+    }
+    .color-orange {
+        background: linear-gradient(135deg, #ffe0b2 0%, #ffcc80 100%);
+        border: 2px solid #ffb74d;
+    }
+    .color-cyan {
+        background: linear-gradient(135deg, #b2ebf2 0%, #80deea 100%);
+        border: 2px solid #4dd0e1;
+    }
+    .color-lime {
+        background: linear-gradient(135deg, #f0f4c3 0%, #dce775 100%);
+        border: 2px solid #cddc39;
+    }
+    .color-indigo {
+        background: linear-gradient(135deg, #c5cae9 0%, #9fa8da 100%);
+        border: 2px solid #7986cb;
+    }
+    .color-teal {
+        background: linear-gradient(135deg, #b2dfdb 0%, #80cbc4 100%);
+        border: 2px solid #4db6ac;
+    }
+    
+    /* 드롭 존 표시 */
+    .drop-zone {
+        border: 2px dashed #667eea;
+        background-color: rgba(102, 126, 234, 0.1);
+    }
+    
+    /* 포스트잇 스타일 - 현대적인 디자인 */
+    .gemini-post-it {
+        position: absolute;
+        width: 220px;
+        min-height: 160px;
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: move;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    /* 드래그 중인 포스트잇은 transition 제거 */
+    .gemini-post-it.dragging {
+        transition: none !important;
+    }
+    
+    .gemini-post-it:hover {
+        box-shadow: 0 5px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* 활성화된 포스트잇 - 파란색 글로우 효과 */
+    .gemini-post-it.active {
+        z-index: 1000;
+        box-shadow: 0 0 25px rgba(66, 153, 225, 0.7), 0 3px 12px rgba(0, 0, 0, 0.25) !important;
+        border: 2px solid rgba(66, 153, 225, 0.9) !important;
+        transform: scale(1.03);
+    }
+    
+    .post-delete-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(220, 53, 69, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        transition: all 0.2s ease;
+        z-index: 10;
+        font-size: 14px;
+        padding: 0;
+        font-weight: bold;
+    }
+    
+    .post-delete-btn:hover {
+        background: rgba(255, 0, 0, 0.9);
+    }
+    
+    .gemini-post-it:hover .post-delete-btn {
+        opacity: 1;
+    }
+    
+    /* Z-index 관리 및 활성화 효과 */
+    .gemini-post-it.active {
+        z-index: 1000;
+        box-shadow: 0 0 20px rgba(66, 153, 225, 0.6), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        border: 2px solid rgba(66, 153, 225, 0.8) !important;
+        transform: scale(1.02);
+    }
+    
+    /* contenteditable 스타일 */
+    .post-content[contenteditable="true"] {
+        outline: none;
+        min-height: 1.5em;
+        cursor: text;
+    }
+    
+    .post-content[contenteditable="true"]:focus {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+        padding: 2px 4px;
+    }
+    
+    .post-content[contenteditable="true"]:empty:before {
+        content: attr(data-placeholder);
+        color: #999;
+        font-style: italic;
+    }
+    
+    /* 포스트 이미지 스타일 */
+    .post-image-container {
+        margin-bottom: 0.5rem;
+    }
+    
+    .post-image {
+        max-width: 100%;
+        border-radius: 4px;
+        display: block;
+    }
+    
+    /* 이미지 업로드 버튼 */
+    .post-image-upload-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        color: #555;
+    }
+    
+    .post-image-upload-btn:hover {
+        background: rgba(0, 0, 0, 0.2);
+        color: #333;
+    }
+    
+    .post-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    /* 파일 다운로드 링크 */
+    .post-file-container {
+        margin-bottom: 0.5rem;
+    }
+    
+    .post-file-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+        text-decoration: none;
+        color: #555;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    .post-file-link:hover {
+        background: rgba(0, 0, 0, 0.1);
+        color: #333;
+    }
+    
+    /* 파일 업로드 버튼 */
+    .post-file-upload-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        color: #555;
+    }
+    
+    .post-file-upload-btn:hover {
+        background: rgba(0, 0, 0, 0.2);
+        color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- CSRF 토큰 (숨겨진 컨테이너) -->
+<div style="display:none;">
+    <form id="csrf-form">
+        {% csrf_token %}
+    </form>
+</div>
+
+<div class="gemini-header mb-4">
+    <h1>
+        <i class="bi bi-kanban"></i> {{ board.title }}
+    </h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'collaboration:board_public' board.id %}" class="btn btn-gemini-secondary">
+            <i class="bi bi-image"></i> 전시 모드로 보기
+        </a>
+    <a href="{% url 'collaboration:board_list' %}" class="btn btn-gemini-secondary">
+        <i class="bi bi-arrow-left"></i> 목록으로 돌아가기
+    </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 왼쪽 사이드바 (col-md-2) -->
+    <div class="col-md-2 mb-4">
+        <div class="sidebar">
+            <!-- Moa 로고 -->
+            <div class="sidebar-logo">
+                <div class="logo-icon">M</div>
+                <span>Moa</span>
+            </div>
+            
+            <!-- 포스트잇 팔레트 선택 -->
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="paletteType" id="paletteType1" value="portfolio" checked>
+                    <label class="form-check-label text-white" for="paletteType1" style="font-size: 0.9rem;">
+                        포스트잇 팔레트
+                    </label>
+                </div>
+            </div>
+            
+            <!-- 포스트잇 팔레트 -->
+            <div class="color-palette">
+                {% for color_value, color_label in color_choices %}
+                    <div class="color-item color-{{ color_value }} draggable-source" data-color="{{ color_value }}">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- 안내 텍스트 -->
+            <p class="small text-white-50 mt-3 mb-0" style="font-size: 0.85rem; line-height: 1.4;">
+                색상을 드래그하여 캔버스에 놓으세요
+            </p>
+        </div>
+    </div>
+    
+    <!-- 오른쪽 캔버스 영역 (col-md-10) -->
+    <div class="col-md-10">
+        <div class="gemini-card">
+    <div class="gemini-canvas" id="canvas">
+        {% if posts %}
+            {% for post in posts %}
+                        <div class="gemini-post-it post-{{ post.color }}" data-post-id="{{ post.id }}" style="left: {{ post.position_x|default:0 }}px; top: {{ post.position_y|default:0 }}px; z-index: {{ post.z_index|default:1 }};">
+                            {% if user.is_authenticated %}
+                                {% if post.user == user or user.is_superuser %}
+                            <button class="post-delete-btn" onclick="deletePost(event, {{ post.id }})" title="삭제">
+                                <i class="bi bi-x"></i>
+                            </button>
+                                {% endif %}
+                            {% endif %}
+                    <p class="mb-1"><strong><i class="bi bi-person"></i> {{ post.user.username }}</strong></p>
+                            {% if post.image %}
+                            <div class="post-image-container mb-2">
+                                <img src="{{ post.image.url }}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">
+                            </div>
+                            {% endif %}
+                            {% if post.attached_file %}
+                            <div class="post-file-container mb-2">
+                                <a href="{{ post.attached_file.url }}" download class="post-file-link">
+                                    <i class="bi bi-paperclip"></i> {{ post.attached_file.name|slice:"6:"|truncatechars:20 }}
+                                </a>
+                            </div>
+                            {% endif %}
+                            <p class="mb-0 post-content" contenteditable="true" data-placeholder="내용을 입력하세요...">{{ post.content|default:"" }}</p>
+                            {% if user.is_authenticated %}
+                                {% if post.user == user or user.is_superuser %}
+                            <div class="post-actions mt-2">
+                                <label class="post-image-upload-btn" title="이미지 업로드">
+                                    <i class="bi bi-image"></i>
+                                    <input type="file" accept="image/*" style="display: none;" onchange="uploadPostImage(event, {{ post.id }})">
+                                </label>
+                                <label class="post-file-upload-btn" title="파일 첨부">
+                                    <i class="bi bi-paperclip"></i>
+                                    <input type="file" style="display: none;" onchange="uploadPostFile(event, {{ post.id }})">
+                                </label>
+                            </div>
+                                {% endif %}
+                            {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="gemini-empty-state">
+                <i class="bi bi-inbox"></i>
+                        <p class="mt-3 mb-0">등록된 포스트가 없습니다. 왼쪽 팔레트에서 색상을 드래그하여 포스트를 만들어보세요.</p>
+            </div>
+        {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 포스트 수정 모달 -->
+<div class="modal fade" id="postEditModal" tabindex="-1" aria-labelledby="postEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="postEditModalLabel">
+                    <i class="bi bi-pencil-square"></i> 포스트 수정
+    </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+            <div class="modal-body">
+                <form id="post-edit-form">
+        <div class="mb-3">
+                        <label for="post-edit-textarea" class="form-label">내용</label>
+                        <textarea class="form-control" id="post-edit-textarea" rows="5" placeholder="포스트 내용을 입력하세요..." required></textarea>
+        </div>
+    </form>
+</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-gemini-primary" id="update-post-btn">
+                    <i class="bi bi-check-circle"></i> 저장
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+<script>
+    // 전역 변수
+    let boardId = {{ board.id }};
+    let currentEditPostId = null;
+    let maxZIndex = 1000;
+    let dragProxy = null;  // 드래그 중인 복제본
+    
+    // CSRF 토큰 가져오기 함수 (안전한 방식)
+    function getCSRFToken() {
+        const tokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!tokenElement) {
+            console.error('CSRF 토큰을 찾을 수 없습니다.');
+            alert('CSRF 토큰을 찾을 수 없습니다. 페이지를 새로고침해주세요.');
+            return null;
+        }
+        return tokenElement.value;
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // interact.js가 로드되었는지 확인
+        if (typeof interact === 'undefined') {
+            console.error('interact.js가 로드되지 않았습니다.');
+            return;
+        }
+        
+        const canvas = document.getElementById('canvas');
+        if (!canvas) {
+            console.error('캔버스 요소를 찾을 수 없습니다.');
+            return;
+        }
+        
+        // 캔버스 빈 공간 더블 클릭 이벤트
+        canvas.addEventListener('dblclick', function(e) {
+            if (e.target === canvas || e.target.classList.contains('gemini-canvas') || e.target.classList.contains('gemini-empty-state')) {
+                const canvasRect = canvas.getBoundingClientRect();
+                let clickX = e.clientX - canvasRect.left;
+                let clickY = e.clientY - canvasRect.top;
+                
+                if (isNaN(clickX) || clickX < 0) clickX = 0;
+                if (isNaN(clickY) || clickY < 0) clickY = 0;
+                
+                const proxyWidth = 200;
+                const proxyHeight = 160;
+                let finalX = clickX - (proxyWidth / 2);
+                let finalY = clickY - (proxyHeight / 2);
+                
+                if (finalX < 0) finalX = 0;
+                if (finalY < 0) finalY = 0;
+                
+                createPostAjax(finalX, finalY, 'yellow');
+            }
+        });
+        
+        // 팔레트 아이템 드래그 설정 (사용자 제공 코드 구조)
+        interact('.draggable-source').draggable({
+            inertia: false,
+            autoScroll: false,
+            listeners: {
+                start(event) {
+                    const target = event.target;
+                    const color = target.dataset.color;
+                    
+                    // 복제본(Proxy) 생성
+                    dragProxy = document.createElement('div');
+                    dragProxy.className = `dragging-proxy post-${color}`; // 색상 클래스 적용
+                    dragProxy.innerText = "여기에 놓으세요";
+                    
+                    // 드래그 성능 최적화: transition 제거 (JS로 직접 주입)
+                    dragProxy.style.transition = 'none !important';
+                    dragProxy.style.willChange = 'left, top';
+                    dragProxy.style.zIndex = '99999'; // z-index 명시적 설정
+                    
+                    document.body.appendChild(dragProxy);
+                    
+                    // 초기 위치 설정: 마우스 포인터 정중앙에 오도록 보정
+                    // 포스트잇 크기: width 200px, height 160px
+                    // 절반: 100px, 80px
+                    updateProxyPosition(event.client.x, event.client.y);
+                },
+                move(event) {
+                    // 마우스 따라다니기
+                    if (dragProxy) {
+                        updateProxyPosition(event.client.x, event.client.y);
+                    }
+                },
+                end(event) {
+                    // 드롭 확인 및 처리
+                    const canvas = document.getElementById('canvas');
+                    const rect = canvas.getBoundingClientRect();
+                    
+                    // 마우스 좌표 (clientX, clientY 사용)
+                    const x = event.client.x;
+                    const y = event.client.y;
+                    
+                    // 마우스가 캔버스 사각형 안에 있는지 확인
+                    const isInside = (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+                    
+                    if (isInside) {
+                        // 캔버스 기준 상대 좌표 계산
+                        const finalX = x - rect.left;
+                        const finalY = y - rect.top;
+                        const color = event.target.dataset.color;
+                        
+                        console.log("드롭 감지됨!", finalX, finalY); // 디버깅용 로그
+                        
+                        // 포스트 생성 요청
+                        createPostAjax(finalX, finalY, color);
+                    } else {
+                        console.log("캔버스 밖입니다.");
+                    }
+                    
+                    // 프록시 제거
+                    if (dragProxy) {
+                        dragProxy.remove();
+                        dragProxy = null;
+                    }
+                }
+            }
+        });
+        
+        function updateProxyPosition(x, y) {
+            if (dragProxy) {
+                // transform: translate(-50%, -50%)를 사용하므로 left/top는 마우스 위치 그대로
+                dragProxy.style.left = x + 'px';
+                dragProxy.style.top = y + 'px';
+            }
+        }
+        
+        // 기존 포스트에 드래그 기능 적용
+        const postIts = document.querySelectorAll('.gemini-post-it');
+        postIts.forEach(function(postIt) {
+            makeDraggable(postIt);
+            setupPostInteractions(postIt);
+        });
+    });
+    
+    // 포스트 상호작용 설정 (더블 클릭, 클릭 시 z-index 증가, contenteditable 편집)
+    function setupPostInteractions(postElement) {
+        const contentElement = postElement.querySelector('.post-content');
+        if (!contentElement) return;
+        
+        // contenteditable 속성 추가 (없으면)
+        if (!contentElement.hasAttribute('contenteditable')) {
+            contentElement.setAttribute('contenteditable', 'true');
+        }
+        
+        // 플레이스홀더 처리
+        const placeholder = contentElement.getAttribute('data-placeholder') || '';
+        if (placeholder) {
+            contentElement.setAttribute('data-placeholder', placeholder);
+        }
+        
+        // 드래그 시작 감지를 위한 변수
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        
+        // mousedown 이벤트로 드래그 시작 감지
+        postElement.addEventListener('mousedown', function(e) {
+            // 삭제 버튼 클릭이 아닐 때만
+            if (!e.target.classList.contains('post-delete-btn') && !e.target.closest('.post-delete-btn')) {
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                isDragging = false;
+                
+                // 짧은 시간 후 드래그인지 확인
+                setTimeout(function() {
+                    if (!isDragging && e.target === contentElement) {
+                        // 드래그가 아니면 편집 모드
+                        contentElement.focus();
+                    }
+                }, 100);
+            }
+            bringToFront(postElement);
+        });
+        
+        // mousemove로 드래그 감지
+        postElement.addEventListener('mousemove', function(e) {
+            const deltaX = Math.abs(e.clientX - dragStartX);
+            const deltaY = Math.abs(e.clientY - dragStartY);
+            if (deltaX > 5 || deltaY > 5) {
+                isDragging = true;
+            }
+        });
+        
+        // 포커스 시 플레이스홀더 제거
+        contentElement.addEventListener('focus', function() {
+            if (this.textContent.trim() === placeholder) {
+                this.textContent = '';
+            }
+            bringToFront(postElement);
+        });
+        
+        // 붙여넣기 이벤트 (Ctrl+V로 이미지 붙여넣기)
+        contentElement.addEventListener('paste', function(e) {
+            const items = e.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    e.preventDefault();
+                    const blob = items[i].getAsFile();
+                    const postId = postElement.getAttribute('data-post-id');
+                    
+                    if (blob && postId) {
+                        // FormData 생성
+                        const formData = new FormData();
+                        formData.append('image', blob, 'pasted-image.png');
+                        
+                        const csrfToken = getCSRFToken();
+                        if (!csrfToken) return;
+                        
+                        // 업로드
+                        fetch('/collaboration/post/' + postId + '/update/', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRFToken': csrfToken
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.image_url) {
+                                // 이미지 미리보기 추가
+                                let imageContainer = postElement.querySelector('.post-image-container');
+                                if (!imageContainer) {
+                                    imageContainer = document.createElement('div');
+                                    imageContainer.className = 'post-image-container mb-2';
+                                    postElement.insertBefore(imageContainer, contentElement);
+                                }
+                                imageContainer.innerHTML = `<img src="${data.image_url}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">`;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Paste upload error:', error);
+                        });
+                    }
+                    break;
+                }
+            }
+        });
+        
+        // 드래그 앤 드롭 업로드
+        postElement.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+            postElement.style.opacity = '0.8';
+        });
+        
+        postElement.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            postElement.style.opacity = '1';
+        });
+        
+        postElement.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            postElement.style.opacity = '1';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                const postId = postElement.getAttribute('data-post-id');
+                
+                if (file.type.startsWith('image/')) {
+                    // 이미지 파일인 경우
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    
+                    const csrfToken = getCSRFToken();
+                    if (!csrfToken) return;
+                    
+                    fetch('/collaboration/post/' + postId + '/update/', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': csrfToken
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.image_url) {
+                            let imageContainer = postElement.querySelector('.post-image-container');
+                            if (!imageContainer) {
+                                imageContainer = document.createElement('div');
+                                imageContainer.className = 'post-image-container mb-2';
+                                postElement.insertBefore(imageContainer, contentElement);
+                            }
+                            imageContainer.innerHTML = `<img src="${data.image_url}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Drag drop upload error:', error);
+                    });
+                } else {
+                    // 일반 파일인 경우
+                    const formData = new FormData();
+                    formData.append('attached_file', file);
+                    
+                    const csrfToken = getCSRFToken();
+                    if (!csrfToken) return;
+                    
+                    fetch('/collaboration/post/' + postId + '/update/', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': csrfToken
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.file_url) {
+                            let fileContainer = postElement.querySelector('.post-file-container');
+                            if (!fileContainer) {
+                                fileContainer = document.createElement('div');
+                                fileContainer.className = 'post-file-container mb-2';
+                                postElement.insertBefore(fileContainer, contentElement);
+                            }
+                            const fileName = data.file_name || file.name;
+                            fileContainer.innerHTML = `<a href="${data.file_url}" download class="post-file-link"><i class="bi bi-paperclip"></i> ${fileName}</a>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Drag drop file upload error:', error);
+                    });
+                }
+            }
+        });
+        
+        // blur 시 플레이스홀더 표시 및 내용 저장 (자동 저장)
+        contentElement.addEventListener('blur', function() {
+            const postId = postElement.getAttribute('data-post-id');
+            const newContent = this.textContent.trim();
+            
+            // 플레이스홀더가 있으면 표시
+            if (!newContent && placeholder) {
+                this.textContent = placeholder;
+            }
+            
+            // 내용이 변경되었으면 서버에 저장 (post_update)
+            const originalContent = this.getAttribute('data-original-content') || '';
+            if (newContent !== originalContent && newContent !== placeholder) {
+                updatePostContent(postId, newContent, contentElement);
+            }
+        });
+        
+        // 원본 내용 저장 (변경 감지용)
+        const currentContent = contentElement.textContent.trim();
+        if (currentContent && currentContent !== placeholder) {
+            contentElement.setAttribute('data-original-content', currentContent);
+        }
+        
+        // 더블 클릭 이벤트 (편집 모드로 전환)
+        postElement.addEventListener('dblclick', function(e) {
+            // 삭제 버튼 클릭이 아닐 때만
+            if (!e.target.classList.contains('post-delete-btn') && !e.target.closest('.post-delete-btn')) {
+                e.stopPropagation();
+                contentElement.focus();
+            }
+        });
+    }
+    
+    // 포스트 내용 업데이트 함수
+    function updatePostContent(postId, content, contentElement) {
+        const formData = new FormData();
+        formData.append('content', content);
+        
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) return;
+        
+        fetch('/collaboration/post/' + postId + '/update/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || '서버 오류가 발생했습니다.');
+                }).catch(() => {
+                    throw new Error('서버 오류가 발생했습니다. (HTTP ' + response.status + ')');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // 원본 내용 업데이트
+                contentElement.setAttribute('data-original-content', content);
+                console.log('Post content updated successfully');
+            } else {
+                alert('오류: ' + (data.message || '포스트 수정에 실패했습니다.'));
+                if (data.errors) {
+                    console.error(data.errors);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('오류: ' + error.message);
+        });
+    }
+    
+    // 포스트를 맨 앞으로 가져오기
+    function bringToFront(element) {
+        maxZIndex += 1;
+        const newZIndex = maxZIndex;
+        element.style.zIndex = newZIndex;
+        element.classList.add('active');
+        
+        // 다른 포스트의 active 클래스 제거
+        document.querySelectorAll('.gemini-post-it').forEach(function(post) {
+            if (post !== element) {
+                post.classList.remove('active');
+            }
+        });
+        
+        // 서버에 z_index 저장
+        const postId = element.getAttribute('data-post-id');
+        if (postId) {
+            updatePostZIndex(postId, newZIndex);
+        }
+    }
+    
+    // 포스트 z_index 업데이트 함수
+    function updatePostZIndex(postId, zIndex) {
+        const formData = new FormData();
+        formData.append('z_index', zIndex);
+        
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) return;
+        
+        fetch('/collaboration/post/' + postId + '/update/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Z-index updated:', zIndex);
+            }
+        })
+        .catch(error => {
+            console.error('Z-index update error:', error);
+        });
+    }
+    
+    // 포스트 이미지 업로드 함수
+    function uploadPostImage(event, postId) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        // 파일 크기 체크 (5MB 제한)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('이미지 크기는 5MB 이하여야 합니다.');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) return;
+        
+        // 로딩 표시
+        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+        if (postElement) {
+            const uploadBtn = postElement.querySelector('.post-image-upload-btn');
+            if (uploadBtn) {
+                uploadBtn.style.opacity = '0.5';
+                uploadBtn.style.pointerEvents = 'none';
+            }
+        }
+        
+        fetch('/collaboration/post/' + postId + '/update/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.image_url) {
+                // 이미지 미리보기 추가
+                const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+                if (postElement) {
+                    let imageContainer = postElement.querySelector('.post-image-container');
+                    if (!imageContainer) {
+                        imageContainer = document.createElement('div');
+                        imageContainer.className = 'post-image-container mb-2';
+                        const contentElement = postElement.querySelector('.post-content');
+                        if (contentElement) {
+                            postElement.insertBefore(imageContainer, contentElement);
+                        }
+                    }
+                    imageContainer.innerHTML = `<img src="${data.image_url}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">`;
+                }
+            } else {
+                alert('이미지 업로드에 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Image upload error:', error);
+            alert('이미지 업로드 중 오류가 발생했습니다.');
+        })
+        .finally(() => {
+            // 로딩 해제
+            if (postElement) {
+                const uploadBtn = postElement.querySelector('.post-image-upload-btn');
+                if (uploadBtn) {
+                    uploadBtn.style.opacity = '1';
+                    uploadBtn.style.pointerEvents = 'auto';
+                }
+            }
+            // 파일 input 초기화
+            event.target.value = '';
+        });
+    }
+    
+    // 포스트 파일 업로드 함수
+    function uploadPostFile(event, postId) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        // 파일 크기 체크 (10MB 제한)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('파일 크기는 10MB 이하여야 합니다.');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('attached_file', file);
+        
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) return;
+        
+        // 로딩 표시
+        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+        if (postElement) {
+            const uploadBtn = postElement.querySelector('.post-file-upload-btn');
+            if (uploadBtn) {
+                uploadBtn.style.opacity = '0.5';
+                uploadBtn.style.pointerEvents = 'none';
+            }
+        }
+        
+        fetch('/collaboration/post/' + postId + '/update/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.file_url) {
+                // 파일 다운로드 링크 추가
+                const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+                if (postElement) {
+                    let fileContainer = postElement.querySelector('.post-file-container');
+                    if (!fileContainer) {
+                        fileContainer = document.createElement('div');
+                        fileContainer.className = 'post-file-container mb-2';
+                        const contentElement = postElement.querySelector('.post-content');
+                        if (contentElement) {
+                            postElement.insertBefore(fileContainer, contentElement);
+                        }
+                    }
+                    const fileName = data.file_name || '첨부 파일';
+                    fileContainer.innerHTML = `<a href="${data.file_url}" download class="post-file-link"><i class="bi bi-paperclip"></i> ${fileName}</a>`;
+                }
+            } else {
+                alert('파일 업로드에 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('File upload error:', error);
+            alert('파일 업로드 중 오류가 발생했습니다.');
+        })
+        .finally(() => {
+            // 로딩 해제
+            if (postElement) {
+                const uploadBtn = postElement.querySelector('.post-file-upload-btn');
+                if (uploadBtn) {
+                    uploadBtn.style.opacity = '1';
+                    uploadBtn.style.pointerEvents = 'auto';
+                }
+            }
+            // 파일 input 초기화
+            event.target.value = '';
+        });
+    }
+    
+    // 포스트 삭제 함수
+    function deletePost(event, postId) {
+        event.stopPropagation();
+        event.preventDefault();
+        
+        if (confirm('정말로 이 포스트를 삭제하시겠습니까?')) {
+            const formData = new FormData();
+            const csrfToken = getCSRFToken();
+            if (!csrfToken) return;
+            formData.append('csrfmiddlewaretoken', csrfToken);
+            
+            // fetch API 사용
+            fetch('/collaboration/post/' + postId + '/delete/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || '서버 오류가 발생했습니다.');
+                    }).catch(() => {
+                        throw new Error('서버 오류가 발생했습니다. (HTTP ' + response.status + ')');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // DOM에서 포스트 제거
+                    const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+                    if (postElement) {
+                        postElement.remove();
+                    }
+                    
+                    // 포스트가 없으면 빈 상태 메시지 표시
+                    const canvas = document.getElementById('canvas');
+                    const remainingPosts = canvas.querySelectorAll('.gemini-post-it');
+                    if (remainingPosts.length === 0) {
+                        const emptyState = document.createElement('div');
+                        emptyState.className = 'gemini-empty-state';
+                        emptyState.innerHTML = `
+                            <i class="bi bi-inbox"></i>
+                            <p class="mt-3 mb-0">등록된 포스트가 없습니다. 왼쪽 팔레트에서 색상을 드래그하여 포스트를 만들어보세요.</p>
+                        `;
+                        canvas.appendChild(emptyState);
+                    }
+                } else {
+                    alert('오류: ' + (data.message || '포스트 삭제에 실패했습니다.'));
+                    if (data.errors) {
+                        console.error(data.errors);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('오류: ' + error.message);
+            });
+        }
+    }
+    
+    // 포스트 수정 모달 저장 버튼 클릭 이벤트
+    document.getElementById('update-post-btn').addEventListener('click', function() {
+        const updateBtn = this;
+        
+        if (!currentEditPostId) {
+            alert('수정할 포스트를 선택해주세요.');
+            return;
+        }
+        
+        const content = document.getElementById('post-edit-textarea').value.trim();
+        
+        if (!content) {
+            alert('내용을 입력해주세요.');
+            return;
+        }
+        
+        // 버튼 비활성화 및 로딩 상태
+        const originalText = updateBtn.innerHTML;
+        updateBtn.disabled = true;
+        updateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 저장 중...';
+        
+        const formData = new FormData();
+        formData.append('content', content);
+        
+        // CSRF 토큰 가져오기
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) return;
+        
+        // fetch API 사용
+        fetch('/collaboration/post/' + currentEditPostId + '/update/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || '서버 오류가 발생했습니다.');
+                }).catch(() => {
+                    throw new Error('서버 오류가 발생했습니다. (HTTP ' + response.status + ')');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // 모달 닫기
+                const modal = bootstrap.Modal.getInstance(document.getElementById('postEditModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // DOM 업데이트
+                const postElement = document.querySelector(`[data-post-id="${currentEditPostId}"]`);
+                if (postElement) {
+                    const contentElement = postElement.querySelector('.post-content');
+                    if (contentElement) {
+                        contentElement.textContent = content;
+                    }
+                }
+                
+                currentEditPostId = null;
+            } else {
+                alert('오류: ' + (data.message || '포스트 수정에 실패했습니다.'));
+                if (data.errors) {
+                    console.error(data.errors);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('오류: ' + error.message);
+        })
+        .finally(() => {
+            // 버튼 다시 활성화
+            updateBtn.disabled = false;
+            updateBtn.innerHTML = originalText;
+        });
+    });
+    
+    // 수정 모달이 닫힐 때 초기화
+    document.getElementById('postEditModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('post-edit-textarea').value = '';
+        currentEditPostId = null;
+    });
+    
+    // 포스트 생성 및 즉시 편집 로직
+    function createPostAjax(finalX, finalY, color) {
+        // 데이터 전송 준비 (빈 content로 생성)
+        const formData = new FormData();
+        formData.append('content', ''); // 빈 문자열로 생성
+        formData.append('board_id', boardId);
+        formData.append('color', color);
+        formData.append('position_x', finalX.toString());
+        formData.append('position_y', finalY.toString());
+        
+        // CSRF 토큰 가져오기
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) {
+            alert('CSRF 토큰을 찾을 수 없습니다. 페이지를 새로고침해주세요.');
+            return;
+        }
+        
+        // fetch를 통해 포스트 생성
+        fetch("{% url 'collaboration:post_create' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || '서버 오류가 발생했습니다.');
+                }).catch(() => {
+                    throw new Error('서버 오류가 발생했습니다. (HTTP ' + response.status + ')');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // 성공 후 처리: addPostToDOM 함수로 포스트잇을 화면에 그림
+                addPostToDOM(data.post, true); // true = 편집 모드로 추가
+                
+                // 즉시 편집 모드: 생성된 포스트잇의 내용 영역을 찾아 focus() 강제 실행
+                setTimeout(() => {
+                    const newPost = document.querySelector(`[data-post-id="${data.post.id}"]`);
+                    if (newPost) {
+                        const contentElement = newPost.querySelector('.post-content');
+                        if (contentElement) {
+                            contentElement.focus();
+                            // 커서를 끝으로 이동
+                            const range = document.createRange();
+                            range.selectNodeContents(contentElement);
+                            range.collapse(false);
+                            const selection = window.getSelection();
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                        }
+                    }
+                }, 50);
+            } else {
+                // 로그인 필요 체크
+                if (data.message === 'login_required') {
+                    if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
+                        window.location.href = data.login_url || '/accounts/login/';
+                    }
+                    return;
+                }
+                alert('오류: ' + (data.message || '저장 실패'));
+                if (data.errors) {
+                    console.error(data.errors);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('오류: ' + error.message);
+        });
+    }
+    
+    // 새 포스트를 DOM에 추가하는 함수
+    function addPostToDOM(post, isEditMode = false) {
+        const canvas = document.getElementById('canvas');
+        
+        // "등록된 포스트가 없습니다." 메시지 제거
+        const noPostsMsg = canvas.querySelector('.gemini-empty-state');
+        if (noPostsMsg) {
+            noPostsMsg.remove();
+        }
+        
+        // 새 포스트 요소 생성
+        const newPost = document.createElement('div');
+        newPost.className = 'gemini-post-it post-' + (post.color || 'yellow');
+        newPost.setAttribute('data-post-id', post.id);
+        // 위치 좌표를 숫자로 변환하여 적용 (기본값 0)
+        const posX = (post.position_x !== undefined && post.position_x !== null && !isNaN(post.position_x)) ? Number(post.position_x) : 0;
+        const posY = (post.position_y !== undefined && post.position_y !== null && !isNaN(post.position_y)) ? Number(post.position_y) : 0;
+        const zIndex = (post.z_index !== undefined && post.z_index !== null) ? Number(post.z_index) : 1;
+        newPost.style.left = posX + 'px';
+        newPost.style.top = posY + 'px';
+        newPost.style.zIndex = zIndex;
+        
+        // maxZIndex 업데이트
+        if (zIndex > maxZIndex) {
+            maxZIndex = zIndex;
+        }
+        
+        // 내용이 비어있으면 플레이스홀더 표시
+        const contentText = post.content || '';
+        const displayContent = contentText || (isEditMode ? '내용을 입력하세요...' : '');
+        
+        // 삭제 버튼 (새로 생성된 포스트는 항상 작성자이므로 표시)
+        const deleteBtnHtml = `<button class="post-delete-btn" onclick="deletePost(event, ${post.id})" title="삭제">
+                <i class="bi bi-x"></i>
+            </button>`;
+        
+        // 이미지 HTML
+        const imageHtml = post.image_url ? `<div class="post-image-container mb-2">
+                <img src="${post.image_url}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">
+            </div>` : '';
+        
+        // 파일 다운로드 링크 HTML
+        const fileHtml = post.file_url ? `<div class="post-file-container mb-2">
+                <a href="${post.file_url}" download class="post-file-link">
+                    <i class="bi bi-paperclip"></i> ${post.file_name || '첨부 파일'}
+                </a>
+            </div>` : '';
+        
+        // 이미지 및 파일 업로드 버튼
+        const imageUploadBtn = `<div class="post-actions mt-2">
+                <label class="post-image-upload-btn" title="이미지 업로드">
+                    <i class="bi bi-image"></i>
+                    <input type="file" accept="image/*" style="display: none;" onchange="uploadPostImage(event, ${post.id})">
+                </label>
+                <label class="post-file-upload-btn" title="파일 첨부">
+                    <i class="bi bi-paperclip"></i>
+                    <input type="file" style="display: none;" onchange="uploadPostFile(event, ${post.id})">
+                </label>
+            </div>`;
+        
+        newPost.innerHTML = `
+            ${deleteBtnHtml}
+            <p class="mb-1"><strong><i class="bi bi-person"></i> ${post.user}</strong></p>
+            ${imageHtml}
+            ${fileHtml}
+            <p class="mb-0 post-content" contenteditable="true" data-placeholder="${contentText ? '' : '내용을 입력하세요...'}">${displayContent}</p>
+            ${imageUploadBtn}
+        `;
+        
+        canvas.appendChild(newPost);
+        
+        // 새로 추가된 포스트에 드래그 기능 및 상호작용 적용
+        makeDraggable(newPost);
+        setupPostInteractions(newPost);
+        bringToFront(newPost);
+        
+        // 편집 모드인 경우 포커스 및 선택 (바로 글을 쓸 수 있도록)
+        if (isEditMode) {
+            const contentElement = newPost.querySelector('.post-content');
+            if (contentElement) {
+                // 플레이스홀더 텍스트 제거
+                if (contentElement.textContent === '내용을 입력하세요...') {
+                    contentElement.textContent = '';
+                }
+                
+                // 즉시 포커스 및 커서 위치 설정
+                setTimeout(() => {
+                    contentElement.focus();
+                    // 커서를 끝으로 이동
+                    const range = document.createRange();
+                    range.selectNodeContents(contentElement);
+                    range.collapse(false);
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }, 50); // 더 빠른 반응을 위해 50ms로 단축
+            }
+        }
+    }
+
+    // 드래그 가능하게 만드는 함수 (기존 포스트 이동용)
+    function makeDraggable(element) {
+        // 포스트잇 전체를 드래그 가능하게 설정
+        // contenteditable 영역에서도 드래그가 가능하도록 allowFrom 사용
+        interact(element).draggable({
+            // 모든 영역에서 드래그 허용 (삭제 버튼 제외는 자동으로 처리됨)
+            allowFrom: null, // null이면 모든 영역에서 드래그 가능
+            ignoreFrom: '.post-delete-btn', // 삭제 버튼은 제외
+            listeners: {
+                start: function(event) {
+                    // 드래그 시작 시 dragging 클래스 추가
+                    element.classList.add('dragging');
+                    // 드래그 시작 시 z-index 증가
+                    bringToFront(event.target);
+                    // contenteditable 비활성화 (드래그 중에는 편집 불가)
+                    const contentElement = event.target.querySelector('.post-content');
+                    if (contentElement) {
+                        contentElement.setAttribute('contenteditable', 'false');
+                        // 포커스 제거
+                        if (document.activeElement === contentElement) {
+                            contentElement.blur();
+                        }
+                    }
+                },
+                move: dragMoveListener,
+                end: function(event) {
+                    const target = event.target;
+                    const x = (parseFloat(target.getAttribute('data-x')) || 0) + parseFloat(target.style.left) || 0;
+                    const y = (parseFloat(target.getAttribute('data-y')) || 0) + parseFloat(target.style.top) || 0;
+                    const postId = target.getAttribute('data-post-id');
+                    
+                    // transform을 실제 left/top으로 변환
+                    const rect = target.getBoundingClientRect();
+                    const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+                    const finalX = rect.left - canvasRect.left;
+                    const finalY = rect.top - canvasRect.top;
+                    
+                    target.style.left = finalX + 'px';
+                    target.style.top = finalY + 'px';
+                    target.style.transform = '';
+                    target.removeAttribute('data-x');
+                    target.removeAttribute('data-y');
+                    
+                    // 드래그 종료 시 dragging 클래스 제거
+                    target.classList.remove('dragging');
+                    
+                    // contenteditable 다시 활성화
+                    const contentElement = target.querySelector('.post-content');
+                    if (contentElement) {
+                        contentElement.setAttribute('contenteditable', 'true');
+                    }
+                    
+                    // 서버에 위치 업데이트
+                    updatePostPosition(postId, finalX, finalY);
+                }
+            }
+        });
+    }
+
+    // 드래그 이동 리스너
+    function dragMoveListener(event) {
+        const target = event.target;
+        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+        // 드래그 중 transition 제거를 위해 dragging 클래스 유지
+        if (!target.classList.contains('dragging')) {
+            target.classList.add('dragging');
+        }
+
+        target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+    }
+
+    // 포스트 위치 업데이트 함수
+    function updatePostPosition(postId, x, y) {
+        const formData = new FormData();
+        formData.append('position_x', x);
+        formData.append('position_y', y);
+        
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) return;
+        
+        const xhr = new XMLHttpRequest();
+        const updateUrl = '/collaboration/post/' + postId + '/update/';
+        xhr.open('POST', updateUrl);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.setRequestHeader('X-CSRFToken', csrfToken);
+        
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    console.log('포스트 위치가 업데이트되었습니다.');
+                }
+            }
+        };
+        
+        xhr.send(formData);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends 'collaboration/base.html' %}
+
+{% block title %}갤러리 - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #f8f9fa;
+        padding-top: 80px;
+    }
+
+    /* 갤러리 헤더 */
+    .gallery-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding-top: 2rem;
+    }
+    
+    .gallery-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+    
+    .gallery-header p {
+        color: #718096;
+        font-size: 1.1rem;
+    }
+    
+    /* Pinterest 스타일 Masonry 레이아웃 */
+    .gallery-grid {
+        display: block;
+        column-count: 4;
+        column-gap: 1.5rem;
+        padding: 0 1rem 3rem;
+    }
+    
+    /* 반응형 분기점 */
+    @media (max-width: 1200px) {
+        .gallery-grid {
+            column-count: 3;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .gallery-grid {
+            column-count: 2;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .gallery-grid {
+            column-count: 1;
+        }
+    }
+    
+    /* 갤러리 아이템 */
+    .gallery-item {
+        display: inline-block;
+        width: 100%;
+        margin-bottom: 1.5rem;
+        break-inside: avoid;
+    }
+    
+    /* 카드 디자인 - 현대적이고 세련된 스타일 */
+    .gallery-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+        display: block;
+    }
+    
+    .gallery-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+    
+    /* 카드 썸네일 영역 */
+    .gallery-thumbnail {
+        width: 100%;
+        height: 0;
+        padding-bottom: 75%; /* 4:3 비율 */
+        background-size: cover;
+        background-position: center;
+        background-color: #f8f9fa;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    /* 카드 콘텐츠 */
+    .gallery-content {
+        padding: 1.25rem;
+    }
+    
+    .gallery-card-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0 0 0.75rem 0;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .gallery-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #a0aec0;
+        font-size: 0.8125rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+    
+    .gallery-card-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+    
+    .gallery-card-meta-item i {
+        font-size: 0.875rem;
+    }
+    
+    .gallery-empty {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #718096;
+    }
+    
+    .gallery-empty i {
+        font-size: 4rem;
+        color: #cbd5e0;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="gallery-header">
+        <h1>갤러리</h1>
+        <p>다른 사용자의 보드를 구경하세요</p>
+    </div>
+
+    {% if boards %}
+    <div class="gallery-grid">
+        {% for board in boards %}
+            {% with thumbnail_url=board.get_thumbnail_url gradient_colors=board.get_gradient_colors %}
+            <div class="gallery-item">
+                <a href="{% url 'collaboration:board_public' board.id %}" class="gallery-card">
+                    <!-- 썸네일 이미지 또는 파스텔톤 그라디언트 -->
+                    <div class="gallery-thumbnail" 
+                         {% if thumbnail_url %}
+                         style="background-image: url('{{ thumbnail_url }}');"
+                         {% else %}
+                         style="background: linear-gradient(135deg, {{ gradient_colors.0 }} 0%, {{ gradient_colors.1 }} 100%);"
+                         {% endif %}>
+                    </div>
+                    
+                    <!-- 카드 콘텐츠 -->
+                    <div class="gallery-content">
+                        <h3 class="gallery-card-title">{{ board.title }}</h3>
+                        <div class="gallery-card-meta">
+                            <span class="gallery-card-meta-item">
+                                <i class="bi bi-person-circle"></i>
+                                <span>{{ board.creator.username }}</span>
+                            </span>
+                            <span class="gallery-card-meta-item">
+                                <i class="bi bi-calendar3"></i>
+                                <span>{{ board.created_at|date:"Y-m-d" }}</span>
+                            </span>
+                            <span class="gallery-card-meta-item">
+                                <i class="bi bi-sticky"></i>
+                                <span>{{ board.posts.count }}개</span>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="gallery-empty">
+        <i class="bi bi-inbox"></i>
+        <h4 class="mt-3 mb-2">등록된 보드가 없습니다</h4>
+        <p class="text-muted">첫 번째 보드를 만들어보세요!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

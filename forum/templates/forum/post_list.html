@@ -1,0 +1,333 @@
+{% extends 'collaboration/base.html' %}
+
+{% block title %}게시판 - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #f8f9fa;
+        padding-top: 80px;
+    }
+    
+    .forum-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .forum-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* 검색창 & 버튼 영역 */
+    .forum-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .search-form {
+        flex: 1;
+        max-width: 500px;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .search-input {
+        flex: 1;
+        border-radius: 50px;
+        border: 2px solid #e0e0e0;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .search-btn {
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        background: #667eea;
+        color: white;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .search-btn:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-create {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+    
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    /* 게시글 리스트 */
+    .forum-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .forum-item {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    
+    .forum-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .forum-item-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+    
+    .forum-item-left {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .forum-item-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .badge-notice {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .forum-item-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: #718096;
+        font-size: 0.875rem;
+        flex-wrap: wrap;
+    }
+    
+    .forum-item-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+    
+    .forum-item-meta-item i {
+        font-size: 0.875rem;
+    }
+    
+    .forum-item-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    .forum-item-author {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #718096;
+        font-size: 0.875rem;
+    }
+    
+    .forum-item-stats {
+        display: flex;
+        gap: 1rem;
+        color: #a0aec0;
+        font-size: 0.8125rem;
+    }
+    
+    /* 모바일 대응 */
+    @media (max-width: 768px) {
+        .forum-item-content {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .forum-item-right {
+            align-items: flex-start;
+            width: 100%;
+        }
+        
+        .forum-item-title {
+            font-size: 1.1rem;
+        }
+        
+        .forum-actions {
+            flex-direction: column;
+        }
+        
+        .search-form {
+            max-width: 100%;
+            width: 100%;
+        }
+    }
+    
+    .forum-empty {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .forum-empty i {
+        font-size: 4rem;
+        color: #cbd5e0;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="forum-header">
+    <div class="container">
+        <h1><i class="bi bi-chat-square-text"></i> 게시판</h1>
+        <p class="mb-0 opacity-75">자유롭게 의견을 나누고 소통하세요</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="forum-actions">
+        <form method="get" action="{% url 'forum:post_list' %}" class="search-form">
+            <input type="text" name="search" class="form-control search-input" 
+                   placeholder="제목, 내용, 작성자로 검색..." 
+                   value="{{ search_query }}">
+            <button type="submit" class="btn search-btn">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+        {% if user.is_authenticated %}
+        <a href="{% url 'forum:post_create' %}" class="btn btn-create">
+            <i class="bi bi-pencil-square"></i> 글쓰기
+        </a>
+        {% endif %}
+    </div>
+
+    {% if page_obj %}
+    <div class="forum-list">
+        {% for post in page_obj %}
+        <a href="{% url 'forum:post_detail' post.pk %}" class="forum-item">
+            <div class="forum-item-content">
+                <div class="forum-item-left">
+                    <div class="forum-item-title">
+                        {% if post.is_notice %}
+                        <span class="badge-notice">공지</span>
+                        {% endif %}
+                        {{ post.title }}
+                    </div>
+                    <div class="forum-item-meta">
+                        <span class="forum-item-meta-item">
+                            <i class="bi bi-calendar3"></i>
+                            <span>{{ post.created_at|date:"Y-m-d" }}</span>
+                        </span>
+                        <span class="forum-item-meta-item">
+                            <i class="bi bi-eye"></i>
+                            <span>{{ post.views }}</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="forum-item-right">
+                    <div class="forum-item-author">
+                        <i class="bi bi-person-circle"></i>
+                        <span>{{ post.author.username }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="forum-empty">
+        <i class="bi bi-inbox"></i>
+        <h4 class="mt-3 mb-2">게시글이 없습니다</h4>
+        <p class="text-muted">첫 번째 게시글을 작성해보세요!</p>
+    </div>
+    {% endif %}
+
+    <!-- 페이지네이션 -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">처음</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">이전</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">다음</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">마지막</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
