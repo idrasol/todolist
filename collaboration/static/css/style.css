@@ -408,4 +408,43 @@ body {
         width: 100% !important;
         min-height: 44px;
     }
+    
+    /* 모바일 버튼 애니메이션 제거 */
+    .btn,
+    .btn-floating,
+    .fab,
+    .btn-gemini-primary,
+    .btn-gemini-secondary,
+    .btn-create,
+    .btn-outline-secondary,
+    .btn-submit,
+    button {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+    }
+    
+    .btn:hover,
+    .btn-floating:hover,
+    .fab:hover,
+    .btn-gemini-primary:hover,
+    .btn-gemini-secondary:hover,
+    .btn-create:hover,
+    .btn-outline-secondary:hover,
+    .btn-submit:hover,
+    button:hover {
+        transform: none !important;
+    }
+    
+    .btn:active,
+    .btn-floating:active,
+    .fab:active,
+    .btn-gemini-primary:active,
+    .btn-gemini-secondary:active,
+    .btn-create:active,
+    .btn-outline-secondary:active,
+    .btn-submit:active,
+    button:active {
+        transform: none !important;
+    }
 }
