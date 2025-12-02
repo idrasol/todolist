@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 from math import isnan
-from .models import Board, Post
+from .models import Board, Post, Comment
 from .forms import BoardForm, PostForm
 
 
@@ -42,28 +42,14 @@ def gallery(request):
         # 비로그인 사용자: 공개 보드만
         boards = Board.objects.filter(is_public=True).order_by('-created_at')
     
+    # 각 보드의 모든 포스트를 가져와서 컨텍스트에 포함
+    posts = Post.objects.filter(board__in=boards).select_related('user', 'board').prefetch_related('comments')
+    
     context = {
-        'boards': boards
+        'boards': boards,
+        'posts': posts
     }
     return render(request, 'collaboration/gallery.html', context)
-
-
-def board_public(request, board_id):
-    """보드 전시 페이지 (Pinterest 스타일)"""
-    board = get_object_or_404(Board, id=board_id)
-    
-    # 비공개 보드는 작성자만 접근 가능
-    if not board.is_public:
-        if not request.user.is_authenticated or board.creator != request.user:
-            return HttpResponseForbidden("이 보드에 접근할 권한이 없습니다.")
-    
-    posts = Post.objects.filter(board=board).order_by('-created_at')
-    
-    context = {
-        'board': board,
-        'posts': posts,
-    }
-    return render(request, 'collaboration/board_public.html', context)
 
 
 def board_detail(request, board_id):
@@ -118,87 +104,102 @@ def post_create(request):
         }, status=401)
     
     try:
-        # 폼 데이터 바인딩
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            
-            # 1. 작성자 및 보드 연결
-            post.user = request.user
-            board_id = request.POST.get('board_id')
-            if not board_id:
-                return JsonResponse({'success': False, 'message': 'Board ID가 누락되었습니다.'}, status=400)
-            post.board = get_object_or_404(Board, id=board_id)
-            
-            # 2. 좌표 데이터 처리 (핵심 수정: 무조건 0.0으로 초기화 후 값이 있으면 덮어쓰기)
-            # 먼저 무조건 0.0으로 초기화 (NOT NULL 에러 방지)
+        # 폼 데이터 바인딩 (POST와 FILES 모두 포함)
+        form = PostForm(request.POST, request.FILES)
+        
+        # 폼이 유효하지 않아도 처리 (이미지만 업로드하는 경우 등)
+        # Post 객체를 직접 생성
+        post = Post()
+        
+        # 1. 작성자 및 보드 연결
+        post.user = request.user
+        board_id = request.POST.get('board_id')
+        if not board_id:
+            return JsonResponse({'success': False, 'message': 'Board ID가 누락되었습니다.'}, status=400)
+        post.board = get_object_or_404(Board, id=board_id)
+        
+        # 2. 좌표 데이터 처리 (핵심 수정: 무조건 0.0으로 초기화 후 값이 있으면 덮어쓰기)
+        # 먼저 무조건 0.0으로 초기화 (NOT NULL 에러 방지)
+        post.position_x = 0.0
+        post.position_y = 0.0
+        
+        # 프론트엔드에서 'position_x' 또는 'x'로 보낼 수 있으므로 둘 다 확인
+        raw_x = request.POST.get('position_x') or request.POST.get('x')
+        raw_y = request.POST.get('position_y') or request.POST.get('y')
+        
+        # 받은 값이 있으면 float로 변환하여 덮어쓰기 (NaN 체크 포함)
+        if raw_x:
+            try:
+                raw_x_str = str(raw_x).strip()
+                if raw_x_str and raw_x_str != 'NaN' and raw_x_str != 'undefined':
+                    parsed_x = float(raw_x_str)
+                    if not isnan(parsed_x):
+                        post.position_x = parsed_x
+            except (ValueError, TypeError, AttributeError):
+                pass  # 이미 0.0으로 설정되어 있으므로 그대로 유지
+        
+        if raw_y:
+            try:
+                raw_y_str = str(raw_y).strip()
+                if raw_y_str and raw_y_str != 'NaN' and raw_y_str != 'undefined':
+                    parsed_y = float(raw_y_str)
+                    if not isnan(parsed_y):
+                        post.position_y = parsed_y
+            except (ValueError, TypeError, AttributeError):
+                pass  # 이미 0.0으로 설정되어 있으므로 그대로 유지
+        
+        # save() 직전에 최종 확인 (NOT NULL 및 NaN 에러 방지) - 무조건 float 값 보장
+        if post.position_x is None or (isinstance(post.position_x, float) and isnan(post.position_x)):
             post.position_x = 0.0
+        if post.position_y is None or (isinstance(post.position_y, float) and isnan(post.position_y)):
             post.position_y = 0.0
-            
-            # 프론트엔드에서 'position_x' 또는 'x'로 보낼 수 있으므로 둘 다 확인
-            raw_x = request.POST.get('position_x') or request.POST.get('x')
-            raw_y = request.POST.get('position_y') or request.POST.get('y')
-            
-            # 받은 값이 있으면 float로 변환하여 덮어쓰기 (NaN 체크 포함)
-            if raw_x:
-                try:
-                    raw_x_str = str(raw_x).strip()
-                    if raw_x_str and raw_x_str != 'NaN' and raw_x_str != 'undefined':
-                        parsed_x = float(raw_x_str)
-                        if not isnan(parsed_x):
-                            post.position_x = parsed_x
-                except (ValueError, TypeError, AttributeError):
-                    pass  # 이미 0.0으로 설정되어 있으므로 그대로 유지
-            
-            if raw_y:
-                try:
-                    raw_y_str = str(raw_y).strip()
-                    if raw_y_str and raw_y_str != 'NaN' and raw_y_str != 'undefined':
-                        parsed_y = float(raw_y_str)
-                        if not isnan(parsed_y):
-                            post.position_y = parsed_y
-                except (ValueError, TypeError, AttributeError):
-                    pass  # 이미 0.0으로 설정되어 있으므로 그대로 유지
-            
-            # save() 직전에 최종 확인 (NOT NULL 및 NaN 에러 방지) - 무조건 float 값 보장
-            if post.position_x is None or (isinstance(post.position_x, float) and isnan(post.position_x)):
-                post.position_x = 0.0
-            if post.position_y is None or (isinstance(post.position_y, float) and isnan(post.position_y)):
-                post.position_y = 0.0
-            
-            # 타입 확인 및 변환 (NaN 체크 포함)
-            if not isinstance(post.position_x, (int, float)) or (isinstance(post.position_x, float) and isnan(post.position_x)):
-                post.position_x = 0.0
-            if not isinstance(post.position_y, (int, float)) or (isinstance(post.position_y, float) and isnan(post.position_y)):
-                post.position_y = 0.0
-            
-            # 3. content 필드 처리 (빈 문자열 허용)
+        
+        # 타입 확인 및 변환 (NaN 체크 포함)
+        if not isinstance(post.position_x, (int, float)) or (isinstance(post.position_x, float) and isnan(post.position_x)):
+            post.position_x = 0.0
+        if not isinstance(post.position_y, (int, float)) or (isinstance(post.position_y, float) and isnan(post.position_y)):
+            post.position_y = 0.0
+        
+        # 3. 이미지 파일 처리 (이미지가 있으면 이미지 전용 Post 생성)
+        if 'image' in request.FILES:
+            post.image = request.FILES['image']
+            # 이미지 전용 Post는 content를 빈 문자열로 초기화
+            post.content = ''
+        else:
+            # 4. content 필드 처리 (빈 문자열 허용)
             content = request.POST.get('content', '').strip()
             post.content = content  # 빈 문자열도 허용
-            
-            # 3. 색상 데이터 처리 (폼에 없으면 별도로 확인)
-            color = request.POST.get('color')
+        
+        # 5. 색상 데이터 처리 (기본값: yellow, 이미지 전용 Post는 색상 불필요)
+        if 'image' not in request.FILES:
+            color = request.POST.get('color', 'yellow')
             if color:
                 post.color = color
                 
-            # 4. 저장
-            post.save()
-            
-            return JsonResponse({
-                'success': True,
-                'post': {
-                    'id': post.id,
-                    'content': post.content,
-                    'user': post.user.username,
-                    'color': post.color,
-                    'position_x': post.position_x,
-                    'position_y': post.position_y,
-                    'z_index': post.z_index,
-                    'image_url': post.image.url if post.image else None
-                }
-            }, status=200)
-        else:
-            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+        # 6. 저장
+        post.save()
+        
+        # 응답 데이터 준비
+        response_data = {
+            'success': True,
+            'post': {
+                'id': post.id,
+                'content': post.content,
+                'user': post.user.username,
+                'color': post.color,
+                'position_x': post.position_x,
+                'position_y': post.position_y,
+                'z_index': post.z_index,
+                'image_url': post.image.url if post.image else None
+            }
+        }
+        
+        # 캔버스 이미지인 경우 추가 정보 포함
+        if post.image:
+            response_data['image_url'] = post.image.url
+            response_data['post_id'] = post.id
+        
+        return JsonResponse(response_data, status=200)
             
     except Exception as e:
         # 서버 내부 에러 발생 시에도 JSON으로 응답
@@ -249,7 +250,7 @@ def post_update(request, post_id):
             if 'attached_file' in request.FILES:
                 try:
                     post.attached_file = request.FILES['attached_file']
-                    post.save()
+                    post.save(update_fields=['attached_file'])
                     return JsonResponse({
                         'success': True,
                         'file_url': post.attached_file.url if post.attached_file else None,
@@ -269,7 +270,7 @@ def post_update(request, post_id):
                     
                     post.position_x = position_x
                     post.position_y = position_y
-                    post.save()
+                    post.save(update_fields=['position_x', 'position_y'])
                     
                     return JsonResponse({
                         'success': True
@@ -278,6 +279,38 @@ def post_update(request, post_id):
                     return JsonResponse({
                         'success': False,
                         'message': f'위치 업데이트 실패: {str(e)}'
+                    }, status=400)
+            
+            # 이미지 크기 업데이트 (width, height)
+            if 'width' in request.POST and 'height' in request.POST:
+                try:
+                    width = float(request.POST.get('width'))
+                    height = float(request.POST.get('height'))
+                    # width와 height를 content에 JSON 형태로 저장 (임시 방법)
+                    # 나중에 모델 필드를 추가할 수 있음
+                    import json
+                    metadata = {}
+                    try:
+                        if post.content and post.content.startswith('{') and 'metadata' in post.content:
+                            metadata = json.loads(post.content).get('metadata', {})
+                    except:
+                        pass
+                    metadata['width'] = width
+                    metadata['height'] = height
+                    # content가 비어있으면 metadata만 저장, 아니면 기존 content 유지
+                    if not post.content or post.content.strip() == '':
+                        post.content = json.dumps({'metadata': metadata})
+                        post.save(update_fields=['content'])
+                    else:
+                        # content가 있으면 metadata를 저장하지 않음 (포스트잇의 텍스트 보호)
+                        pass
+                    return JsonResponse({
+                        'success': True
+                    })
+                except (ValueError, TypeError) as e:
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'이미지 크기 업데이트 실패: {str(e)}'
                     }, status=400)
             
             # z_index 업데이트
@@ -359,4 +392,91 @@ def post_delete(request, post_id):
         return redirect('collaboration:board_detail', board_id=post.board.id)
     
     return JsonResponse({'success': False}, status=400)
+
+
+@require_POST
+def post_feedback(request, post_id):
+    """포스트 피드백 처리 (좋아요) - AJAX POST 허용"""
+    post = get_object_or_404(Post, id=post_id)
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'success': False,
+            'message': '로그인이 필요합니다.',
+            'login_url': '/accounts/login/'
+        }, status=401)
+    
+    feedback_type = request.POST.get('type')  # 'like' only
+    
+    # 싫어요 기능 제거 - like만 허용
+    if feedback_type != 'like':
+        return JsonResponse({
+            'success': False,
+            'message': '잘못된 피드백 타입입니다.'
+        }, status=400)
+    
+    # 세션을 사용하여 중복 클릭 방지
+    session_key = 'liked_posts'
+    liked_posts = request.session.get(session_key, [])
+    
+    # post_id를 문자열로 변환하여 비교
+    post_id_str = str(post_id)
+    if post_id_str in liked_posts:
+        return JsonResponse({
+            'success': False,
+            'message': '이미 좋아요를 누르셨습니다.',
+            'likes': post.likes,
+            'dislikes': post.dislikes
+        }, status=400)
+    
+    # 좋아요 증가
+    post.likes += 1
+    post.save(update_fields=['likes'])
+    
+    # 세션에 추가 (문자열로 저장)
+    liked_posts.append(post_id_str)
+    request.session[session_key] = liked_posts
+    
+    return JsonResponse({
+        'success': True,
+        'likes': post.likes,
+        'dislikes': post.dislikes
+    })
+
+
+@require_POST
+def comment_create(request, post_id):
+    """댓글 작성 - AJAX POST 허용"""
+    post = get_object_or_404(Post, id=post_id)
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'success': False,
+            'message': '로그인이 필요합니다.',
+            'login_url': '/accounts/login/'
+        }, status=401)
+    
+    content = request.POST.get('content', '').strip()
+    
+    if not content:
+        return JsonResponse({
+            'success': False,
+            'message': '댓글 내용을 입력해주세요.'
+        }, status=400)
+    
+    comment = Comment.objects.create(
+        post=post,
+        author=request.user,
+        content=content
+    )
+    
+    return JsonResponse({
+        'success': True,
+        'comment': {
+            'id': comment.id,
+            'content': comment.content,
+            'author': comment.author.username,
+            'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M')
+        }
+    })
 

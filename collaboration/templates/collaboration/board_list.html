@@ -9,6 +9,25 @@
         padding-top: 80px;
     }
 
+    /* 보드 목록 헤더 */
+    .board-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding-top: 2rem;
+    }
+    
+    .board-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+    
+    .board-header p {
+        color: #718096;
+        font-size: 1.1rem;
+    }
+
     .board-card {
         border: none;
         border-radius: 12px;
@@ -168,6 +187,26 @@
         margin-bottom: 1rem;
     }
     
+    /* 보드 생성 버튼 스타일 */
+    .board-list-sidebar .btn-gemini-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .board-list-sidebar .btn-gemini-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+    
+    .board-list-sidebar .btn-gemini-primary:active {
+        transform: translateY(0);
+    }
+    
     .board-list-sidebar .form-label {
         font-size: 0.85rem;
         font-weight: 600;
@@ -277,79 +316,81 @@
         }
     }
     
+    /* 모바일에서도 데스크탑 레이아웃 유지 */
     @media (max-width: 768px) {
+        /* 모든 모바일 스타일 제거 - 데스크탑과 동일하게 유지 */
         .layout-masonry .board-list-container {
-            column-count: 2;
+            column-count: 4;
         }
         
-        /* 모바일에서도 가로 레이아웃 유지 */
         .row.gx-0 {
             flex-direction: row;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+            flex-wrap: wrap;
+            overflow-x: visible;
         }
         
         .row.gx-0 > .col-12 {
-            flex: 0 0 auto;
+            flex: 1 1 auto;
         }
         
         .board-list-sidebar {
             margin-bottom: 1rem;
-            min-width: 200px;
+            min-width: auto;
         }
         
         .col-12.col-md-9.col-lg-10 {
-            min-width: calc(100% - 220px);
+            min-width: auto;
         }
         
         .layout-list .board-thumbnail {
-            width: 150px;
+            width: 200px;
         }
         
-        /* 모바일에서 카드 크기 조정 */
         .board-thumbnail {
-            height: 150px;
+            height: 180px;
         }
         
         .layout-grid .board-list-container {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
         }
         
         .layout-compact .board-list-container {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
         }
         
         .layout-tile .board-list-container {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
         }
         
         .layout-gallery .board-list-container {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
         }
     }
     
     @media (max-width: 576px) {
+        /* 작은 화면에서도 데스크탑 레이아웃 유지 */
         .layout-grid .board-list-container,
         .layout-compact .board-list-container,
         .layout-tile .board-list-container,
         .layout-gallery .board-list-container {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
         }
         
         .board-thumbnail {
-            height: 120px;
+            height: 180px;
         }
         
         .board-card-body {
-            padding: 0.75rem;
+            padding: 1rem;
         }
         
         .board-card-title {
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
     }
     
@@ -531,12 +572,9 @@
 
 {% block content %}
 <div class="container-fluid px-0">
-    <div class="gemini-header px-3 mb-3">
-        <div class="d-flex justify-content-end">
-            <a href="{% url 'collaboration:board_create' %}" class="btn btn-gemini-primary">
-                <i class="bi bi-plus-circle"></i> 새 보드 만들기
-            </a>
-        </div>
+    <div class="board-header px-3">
+        <h1>보드 목록</h1>
+        <p>나의 보드와 공개 보드를 확인하세요</p>
     </div>
 
     <div class="row gx-0 px-2">
@@ -548,6 +586,11 @@
                     <i class="bi bi-chevron-down"></i>
                 </button>
                 <div class="collapse d-md-block" id="sidebarMenu">
+                    <!-- 보드 생성 버튼 -->
+                    <a href="{% url 'collaboration:board_create' %}" class="btn btn-gemini-primary w-100 mb-3 d-flex align-items-center justify-content-center" style="font-weight: 600; padding: 0.75rem;">
+                        <i class="bi bi-plus-circle me-2"></i> 새 보드 만들기
+                    </a>
+                    
                     <label class="form-label d-flex align-items-center mb-2">
                         <i class="bi bi-layout-three-columns me-2"></i>카드 배치
                     </label>

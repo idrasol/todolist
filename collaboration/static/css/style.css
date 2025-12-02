@@ -347,3 +347,13 @@ body {
 .gemini-bg-surface {
     background-color: var(--gemini-surface) !important;
 }
+
+/* 버그 1: 포스트잇 내부 이미지 크기 제한 */
+.gemini-post-it img,
+.post-image-container img,
+.post-image {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    object-fit: contain;
+}

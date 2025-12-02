@@ -137,7 +137,7 @@
     
     /* 해상도 모드일 때 min-height 제거 */
     .canvas-size-640x480,
-    .canvas-size-800x480,
+    .canvas-size-800x600,
     .canvas-size-1280x720,
     .canvas-size-1920x1080 {
         min-height: 0 !important;
@@ -151,9 +151,9 @@
         overflow: hidden;
     }
     
-    .canvas-size-800x480 {
+    .canvas-size-800x600 {
         width: 800px !important;
-        height: 480px !important;
+        height: 600px !important;
         margin: 0 auto;
         overflow: hidden;
     }
@@ -180,7 +180,7 @@
     
     /* 캔버스 카드 크기 조절 */
     .gemini-card.canvas-size-640x480,
-    .gemini-card.canvas-size-800x480,
+    .gemini-card.canvas-size-800x600,
     .gemini-card.canvas-size-1280x720,
     .gemini-card.canvas-size-1920x1080 {
         width: 100%;
@@ -220,10 +220,10 @@
         border: 1px solid #e8eaed;
     }
     
-    /* 모바일에서 사이드바 최적화 */
+    /* 모바일에서 사이드바 바텀 시트 스타일 */
     @media (max-width: 768px) {
         .sidebar {
-            position: relative !important;
+            position: relative !important; /* 모바일에서는 일반 배치 */
             top: auto !important;
             width: 100%;
             border-radius: 12px;
@@ -237,19 +237,6 @@
             margin-top: 1rem;
         }
         
-        /* 모바일에서도 가로 레이아웃 유지 */
-        .row.gx-0 {
-            flex-direction: row;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .row.gx-0 > .col-12 {
-            flex: 0 0 auto;
-            min-width: 280px;
-        }
-        
         /* 모바일에서 캔버스와 사이드바 간격 */
         .order-1 {
             margin-bottom: 1rem;
@@ -259,7 +246,7 @@
             margin-top: 1rem;
         }
         
-        /* 모바일에서 색상 팔레트 가로 스크롤 */
+        /* 모바일에서 색상 팔레트 가로 스크롤 방지 */
         .color-palette {
             grid-template-columns: repeat(5, 1fr);
             gap: 0.5rem;
@@ -273,17 +260,6 @@
         
         .color-item i {
             font-size: 1.2rem;
-        }
-        
-        /* 모바일에서 캔버스 해상도 조정 */
-        .canvas-size-640x480,
-        .canvas-size-800x480,
-        .canvas-size-1280x720,
-        .canvas-size-1920x1080 {
-            width: 100% !important;
-            max-width: 100%;
-            height: auto !important;
-            min-height: 400px;
         }
     }
     
@@ -512,6 +488,7 @@
     .gemini-post-it {
         position: absolute;
         width: 220px;
+        height: 160px; /* 고정 높이로 초기화 (세로로 길어지는 현상 방지) */
         min-height: 160px;
         padding: 18px;
         border-radius: 10px;
@@ -527,6 +504,10 @@
         -ms-user-select: none !important;
         -webkit-touch-callout: none !important;
         -webkit-tap-highlight-color: transparent !important;
+        /* 리사이즈 가능하도록 설정 */
+        resize: none; /* 기본 resize 제거 */
+        overflow: visible; /* 테두리 영역 표시 */
+        box-sizing: border-box; /* 패딩 포함 크기 계산 */
     }
     
     /* 드래그 중인 포스트잇은 transition 제거 */
@@ -534,8 +515,16 @@
         transition: none !important;
     }
     
+    /* 리사이즈 중인 포스트잇 */
+    .gemini-post-it.resizing {
+        transition: none !important;
+        border-color: rgba(102, 126, 234, 0.8) !important;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3) !important;
+    }
+    
     .gemini-post-it:hover {
         box-shadow: 0 5px 16px rgba(0, 0, 0, 0.2);
+        border-color: rgba(102, 126, 234, 0.4);
     }
     
     /* 활성화된 포스트잇 - 파란색 글로우 효과 */
@@ -544,6 +533,116 @@
         box-shadow: 0 0 25px rgba(66, 153, 225, 0.7), 0 3px 12px rgba(0, 0, 0, 0.25) !important;
         border: 2px solid rgba(66, 153, 225, 0.9) !important;
         transform: scale(1.03);
+    }
+    
+    /* 캔버스 이미지 개체 스타일 */
+    .canvas-image {
+        position: absolute;
+        background: white;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+        cursor: move;
+        overflow: hidden;
+        box-sizing: border-box;
+        touch-action: none !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        -webkit-touch-callout: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+        resize: none;
+        overflow: visible;
+    }
+    
+    .canvas-image.dragging {
+        transition: none !important;
+    }
+    
+    .canvas-image.resizing {
+        transition: none !important;
+        border-color: rgba(102, 126, 234, 0.8) !important;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3) !important;
+    }
+    
+    .canvas-image:hover {
+        box-shadow: 0 5px 16px rgba(0, 0, 0, 0.2);
+        border-color: rgba(102, 126, 234, 0.4);
+    }
+    
+    .canvas-image-delete {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(220, 53, 69, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        transition: all 0.2s ease;
+        z-index: 10;
+        font-size: 14px;
+        padding: 0;
+        font-weight: bold;
+    }
+    
+    .canvas-image:hover .canvas-image-delete {
+        opacity: 1;
+    }
+    
+    .canvas-image-delete:hover {
+        background: rgba(220, 53, 69, 1);
+        transform: scale(1.1);
+    }
+    
+    /* 우클릭 컨텍스트 메뉴 스타일 */
+    .context-menu {
+        position: fixed;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        min-width: 180px;
+        padding: 4px 0;
+    }
+    
+    .context-menu-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .context-menu-item {
+        padding: 10px 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #333;
+        transition: background-color 0.2s;
+    }
+    
+    .context-menu-item:hover {
+        background-color: #f0f0f0;
+    }
+    
+    .context-menu-item i {
+        width: 18px;
+        text-align: center;
+    }
+    
+    .context-menu-item:last-child {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        margin-top: 4px;
     }
     
     .post-delete-btn {
@@ -609,9 +708,11 @@
     }
     
     .post-image {
-        max-width: 100%;
+        max-width: 100% !important;
+        height: auto !important;
         border-radius: 4px;
         display: block;
+        object-fit: contain;
     }
     
     /* 이미지 업로드 버튼 */
@@ -737,7 +838,6 @@
         <i class="bi bi-kanban"></i> {{ board.title }}
     </h1>
         <div class="d-flex gap-2">
-            <a href="{% url 'collaboration:board_public' board.id %}" class="btn btn-gemini-secondary">
                 <i class="bi bi-image"></i> 전시 모드로 보기
             </a>
     <a href="{% url 'collaboration:board_list' %}" class="btn btn-gemini-secondary">
@@ -747,15 +847,9 @@
 </div>
 
     <div class="row gx-0">
-    <!-- 왼쪽 사이드바 (col-md-2) - 모바일에서도 가로로 배치 -->
+    <!-- 왼쪽 사이드바 (col-md-2) - 모바일에서는 하단에 배치 -->
     <div class="col-12 col-md-2 mb-4 order-2 order-md-1 px-2">
         <div class="sidebar sidebar-mobile">
-            <!-- 모바일에서 사이드바 접기 버튼 -->
-            <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center mb-3 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSidebar" aria-expanded="false" aria-controls="mobileSidebar" style="font-weight: 500; color: #2d3748; border-color: #d0d0d0;">
-                <span><i class="bi bi-sliders me-2"></i>메뉴</span>
-                <i class="bi bi-chevron-down"></i>
-            </button>
-            <div class="collapse d-md-block" id="mobileSidebar">
             <!-- 포스트잇 드롭다운 -->
             <div class="mb-3">
                 <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#postitMenu" aria-expanded="false" aria-controls="postitMenu" style="font-weight: 500; color: #2d3748; border-color: #d0d0d0;">
@@ -788,7 +882,7 @@
                     </label>
                     <select id="canvasSizeSelect" class="form-select form-select-sm mb-3" style="background: white; color: #2d3748; border: 2px solid #e8eaed; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
                         <option value="640x480">640 x 480</option>
-                        <option value="800x480" selected>800 x 480</option>
+                        <option value="800x600" selected>800 x 600</option>
                         <option value="1280x720">1280 x 720</option>
                         <option value="1920x1080">1920 x 1080</option>
                     </select>
@@ -805,32 +899,65 @@
                         <option value="creamy">크리미</option>
                         <option value="blue-sky">블루 스카이</option>
                     </select>
-                </div>
             </div>
             </div>
         </div>
     </div>
     
-    <!-- 오른쪽 캔버스 영역 (col-md-10) - 모바일에서도 가로로 배치 -->
+    <!-- 오른쪽 캔버스 영역 (col-md-10) - 모바일에서는 상단에 배치 -->
     <div class="col-12 col-md-10 order-1 order-md-2 px-2">
         <div class="gemini-card p-0">
     <div class="gemini-canvas canvas-theme-default" id="canvas">
+        <!-- 우클릭 컨텍스트 메뉴 -->
+        <div id="contextMenu" class="context-menu" style="display: none;">
+            <ul class="context-menu-list">
+                <li class="context-menu-item" id="contextMenuImageUpload">
+                    <i class="bi bi-image"></i> 이미지 업로드
+                </li>
+                <li class="context-menu-item" id="contextMenuTextPost">
+                    <i class="bi bi-sticky"></i> 텍스트 포스트 추가
+                </li>
+                <li class="context-menu-item" id="contextMenuCanvasSettings">
+                    <i class="bi bi-gear"></i> 캔버스 설정
+                </li>
+                <li class="context-menu-item" id="contextMenuCancel">
+                    <i class="bi bi-x"></i> 취소
+                </li>
+            </ul>
+        </div>
         {% if posts %}
             {% for post in posts %}
-                        <div class="gemini-post-it post-{{ post.color }}" data-post-id="{{ post.id }}" style="left: {{ post.position_x|default:0 }}px; top: {{ post.position_y|default:0 }}px; z-index: {{ post.z_index|default:1 }};">
-                            {% if user.is_authenticated %}
-                                {% if post.user == user or user.is_superuser %}
-                            <button class="post-delete-btn" onclick="deletePost(event, {{ post.id }})" title="삭제">
-                                <i class="bi bi-x"></i>
-                            </button>
-                                {% endif %}
+                {% comment %}이미지만 있고 텍스트가 없는 경우에만 .canvas-image로 표시 (메타데이터만 있는 경우도 포함){% endcomment %}
+                {% if post.image %}
+                    {% if not post.content or post.content|slice:":1" == "{" %}
+                        {# 이미지만 있고 텍스트가 없거나 메타데이터만 있으면 .canvas-image 개체로 표시 #}
+                        <div class="canvas-image" data-post-id="{{ post.id }}" data-image-id="{{ post.id }}" style="left: {{ post.position_x|default:0 }}px; top: {{ post.position_y|default:0 }}px; z-index: {{ post.z_index|default:1 }}; width: 300px; height: 300px;">
+                        {% if user.is_authenticated %}
+                            {% if post.user == user or user.is_superuser %}
+                                <button class="canvas-image-delete" onclick="deleteCanvasImageFromTemplate({{ post.id }})" title="삭제">
+                                    <i class="bi bi-x"></i>
+                                </button>
                             {% endif %}
-                    <p class="mb-1"><strong><i class="bi bi-person"></i> {{ post.user.username }}</strong></p>
-                            {% if post.image %}
-                            <div class="post-image-container mb-2">
-                                <img src="{{ post.image.url }}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">
-                            </div>
+                        {% endif %}
+                        <img src="{{ post.image.url }}" alt="캔버스 이미지" style="width: 100%; height: 100%; object-fit: contain; border-radius: 4px;">
+                        </div>
+                    {% else %}
+                    {# 텍스트가 있거나 이미지와 텍스트가 모두 있으면 .gemini-post-it (텍스트 포스트잇)으로 표시 #}
+                    <div class="gemini-post-it post-{{ post.color }}" data-post-id="{{ post.id }}" style="left: {{ post.position_x|default:0 }}px; top: {{ post.position_y|default:0 }}px; z-index: {{ post.z_index|default:1 }};">
+                        {% if user.is_authenticated %}
+                            {% if post.user == user or user.is_superuser %}
+                        <button class="post-delete-btn" onclick="deletePost(event, {{ post.id }})" title="삭제">
+                            <i class="bi bi-x"></i>
+                        </button>
                             {% endif %}
+                        {% endif %}
+                <p class="mb-1"><strong><i class="bi bi-person"></i> {{ post.user.username }}</strong></p>
+                        {% if post.image %}
+                            {# 포스트잇 내부에 이미지 표시 #}
+                        <div class="post-image-container mb-2">
+                            <img src="{{ post.image.url }}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">
+                        </div>
+                        {% endif %}
                             {% if post.attached_file %}
                             <div class="post-file-container mb-2">
                                 <a href="{{ post.attached_file.url }}" download class="post-file-link">
@@ -838,7 +965,15 @@
                                 </a>
                             </div>
                             {% endif %}
-                            <p class="mb-0 post-content" contenteditable="true" data-placeholder="내용을 입력하세요...">{{ post.content|default:"" }}</p>
+                            <p class="mb-0 post-content" contenteditable="true" data-placeholder="내용을 입력하세요...">
+                                {% if post.content %}
+                                    {% if post.content|slice:":1" == "{" and "metadata" in post.content %}
+                                        {# 메타데이터만 있는 경우 표시하지 않음 #}
+                                    {% else %}
+                                        {{ post.content }}
+                                    {% endif %}
+                                {% endif %}
+                            </p>
                             {% if user.is_authenticated %}
                                 {% if post.user == user or user.is_superuser %}
                             <div class="post-actions mt-2">
@@ -853,7 +988,51 @@
                             </div>
                                 {% endif %}
                             {% endif %}
-                </div>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    {# 이미지가 없고 텍스트만 있는 경우 .gemini-post-it (텍스트 포스트잇)으로 표시 #}
+                    <div class="gemini-post-it post-{{ post.color }}" data-post-id="{{ post.id }}" style="left: {{ post.position_x|default:0 }}px; top: {{ post.position_y|default:0 }}px; z-index: {{ post.z_index|default:1 }};">
+                        {% if user.is_authenticated %}
+                            {% if post.user == user or user.is_superuser %}
+                        <button class="post-delete-btn" onclick="deletePost(event, {{ post.id }})" title="삭제">
+                            <i class="bi bi-x"></i>
+                        </button>
+                            {% endif %}
+                        {% endif %}
+                <p class="mb-1"><strong><i class="bi bi-person"></i> {{ post.user.username }}</strong></p>
+                            {% if post.attached_file %}
+                            <div class="post-file-container mb-2">
+                                <a href="{{ post.attached_file.url }}" download class="post-file-link">
+                                    <i class="bi bi-paperclip"></i> {{ post.attached_file.name|slice:"6:"|truncatechars:20 }}
+                                </a>
+                            </div>
+                            {% endif %}
+                            <p class="mb-0 post-content" contenteditable="true" data-placeholder="내용을 입력하세요...">
+                                {% if post.content %}
+                                    {% if post.content|slice:":1" == "{" and "metadata" in post.content %}
+                                        {# 메타데이터만 있는 경우 표시하지 않음 #}
+                                    {% else %}
+                                        {{ post.content }}
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+                            {% if user.is_authenticated %}
+                                {% if post.user == user or user.is_superuser %}
+                            <div class="post-actions mt-2">
+                                <label class="post-image-upload-btn" title="이미지 업로드">
+                                    <i class="bi bi-image"></i>
+                                    <input type="file" accept="image/*" style="display: none;" onchange="uploadPostImage(event, {{ post.id }})">
+                                </label>
+                                <label class="post-file-upload-btn" title="파일 첨부">
+                                    <i class="bi bi-paperclip"></i>
+                                    <input type="file" style="display: none;" onchange="uploadPostFile(event, {{ post.id }})">
+                                </label>
+                            </div>
+                                {% endif %}
+                            {% endif %}
+                    </div>
+                {% endif %}
             {% endfor %}
         {% else %}
             <div class="gemini-empty-state">
@@ -925,7 +1104,7 @@
         if (!canvas) return;
         
         // 기존 크기 클래스 제거 (모든 가능한 해상도 클래스)
-        const allSizes = ['640x480', '800x480', '1280x720', '1920x1080', 'full', 'small', 'medium', 'large'];
+        const allSizes = ['640x480', '800x600', '1280x720', '1920x1080', 'full', 'small', 'medium', 'large'];
         allSizes.forEach(s => {
             canvas.classList.remove(`canvas-size-${s}`);
             if (canvasCard) {
@@ -945,7 +1124,7 @@
     
     // 저장된 캔버스 크기 불러오기
     function loadCanvasSize() {
-        const savedSize = localStorage.getItem('canvasSize') || '800x480';
+        const savedSize = localStorage.getItem('canvasSize') || '800x600';
         const select = document.getElementById('canvasSizeSelect');
         if (select) {
             select.value = savedSize;
@@ -1116,13 +1295,620 @@
             }
         }
         
-        // 기존 포스트에 드래그 기능 적용
+        // 기존 포스트잇에 드래그 및 리사이즈 기능 적용
         const postIts = document.querySelectorAll('.gemini-post-it');
         postIts.forEach(function(postIt) {
             makeDraggable(postIt);
+            makeResizable(postIt);
             setupPostInteractions(postIt);
+            
+            // 버그 2: 이미지가 있는 경우 이미지 로드 완료 후 크기 자동 조절
+            const imageElement = postIt.querySelector('.post-image-container img');
+            if (imageElement) {
+                // 이미지 로드 완료 핸들러 (강력한 구현)
+                const handleImageLoadForResize = function() {
+                    // 이미지 로드 완료 후 포스트잇 크기 자동 조절
+                    autoResizePostIt(postIt);
+                    // 이벤트 핸들러 제거 (중복 호출 방지)
+                    imageElement.removeEventListener('load', handleImageLoadForResize);
+                    imageElement.removeEventListener('error', handleImageErrorForResize);
+                };
+                
+                const handleImageErrorForResize = function() {
+                    console.warn('이미지 로드 실패:', imageElement.src);
+                    imageElement.removeEventListener('load', handleImageLoadForResize);
+                    imageElement.removeEventListener('error', handleImageErrorForResize);
+                };
+                
+                // 이미지가 이미 로드된 경우 즉시 처리
+                if (imageElement.complete && imageElement.naturalWidth > 0) {
+                    // 다음 프레임에서 실행하여 DOM 렌더링 완료 보장
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            autoResizePostIt(postIt);
+                        }, 0);
+                    });
+                } else {
+                    // 이미지 로드 대기
+                    imageElement.addEventListener('load', handleImageLoadForResize, { once: true });
+                    imageElement.addEventListener('error', handleImageErrorForResize, { once: true });
+                }
+            } else {
+                // 이미지가 없는 경우 텍스트 내용에 따라 크기 조절
+                const contentElement = postIt.querySelector('.post-content');
+                const hasContent = contentElement && contentElement.textContent && 
+                                 contentElement.textContent.trim() !== '' && 
+                                 contentElement.textContent.trim() !== '내용을 입력하세요...';
+                if (hasContent) {
+                    autoResizePostIt(postIt);
+                }
+            }
         });
+        
+        // 기존 캔버스 이미지에 드래그 및 리사이즈 기능 적용 및 크기 자동 조정
+        const canvasImages = document.querySelectorAll('.canvas-image');
+        canvasImages.forEach(function(canvasImage) {
+            makeDraggable(canvasImage);
+            makeResizable(canvasImage);
+            
+            // 이미지 로드 완료 후 크기 자동 조정 (원본 비율 유지, 잘림 방지)
+            const img = canvasImage.querySelector('img');
+            if (img) {
+                const handleImageLoadForResize = function() {
+                    // 원본 이미지 크기 가져오기
+                    const naturalWidth = img.naturalWidth;
+                    const naturalHeight = img.naturalHeight;
+                    
+                    if (naturalWidth > 0 && naturalHeight > 0) {
+                        // 원본 비율 계산
+                        const aspectRatio = naturalWidth / naturalHeight;
+                        
+                        // 최대 폭 제한 (300px)
+                        const maxWidth = 300;
+                        let finalWidth = naturalWidth;
+                        let finalHeight = naturalHeight;
+                        
+                        // 이미지가 최대 폭보다 크면 비율 유지하며 축소
+                        if (naturalWidth > maxWidth) {
+                            finalWidth = maxWidth;
+                            finalHeight = maxWidth / aspectRatio; // 비율 유지하여 높이 계산
+                        } else {
+                            // 원본이 작으면 원본 크기 사용 (비율 유지)
+                            finalWidth = naturalWidth;
+                            finalHeight = naturalHeight;
+                        }
+                        
+                        // 컨테이너 크기를 이미지 크기에 맞게 조정 (원본 비율 유지, 잘림 방지)
+                        canvasImage.style.width = finalWidth + 'px';
+                        canvasImage.style.height = finalHeight + 'px';
+                        
+                        // 이미지 크기를 컨테이너에 맞게 설정 (비율 유지, 잘림 방지)
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'contain'; // contain 사용하여 잘림 방지
+                        
+                        // 서버에 변경된 크기 저장
+                        const postId = canvasImage.getAttribute('data-post-id');
+                        if (postId) {
+                            updatePostSize(postId, finalWidth, finalHeight);
+                        }
+                    } else {
+                        // 이미지 크기를 알 수 없는 경우 기본값 사용
+                        canvasImage.style.width = '300px';
+                        canvasImage.style.height = '300px';
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'contain';
+                    }
+                    
+                    // 이벤트 핸들러 제거 (중복 호출 방지)
+                    img.removeEventListener('load', handleImageLoadForResize);
+                    img.removeEventListener('error', handleImageErrorForResize);
+                };
+                
+                const handleImageErrorForResize = function() {
+                    console.warn('이미지 로드 실패:', img.src);
+                    // 기본 크기 설정
+                    canvasImage.style.width = '300px';
+                    canvasImage.style.height = '300px';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'contain';
+                    img.removeEventListener('load', handleImageLoadForResize);
+                    img.removeEventListener('error', handleImageErrorForResize);
+                };
+                
+                // 이미지가 이미 로드된 경우 즉시 처리
+                if (img.complete && img.naturalWidth > 0) {
+                    // 다음 프레임에서 실행하여 DOM 렌더링 완료 보장
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            handleImageLoadForResize();
+                        }, 0);
+                    });
+                } else {
+                    // 이미지 로드 대기
+                    img.addEventListener('load', handleImageLoadForResize, { once: true });
+                    img.addEventListener('error', handleImageErrorForResize, { once: true });
+                }
+            }
+        });
+        
+        // 우클릭 컨텍스트 메뉴 초기화
+        initContextMenu();
     });
+    
+    // 우클릭 컨텍스트 메뉴 초기화
+    function initContextMenu() {
+        const canvas = document.getElementById('canvas');
+        const contextMenu = document.getElementById('contextMenu');
+        let contextMenuX = 0;
+        let contextMenuY = 0;
+        
+        // 핵심: contextMenu를 document.body로 이동 (DOM 트리 최상위 레벨로 이동)
+        if (contextMenu && contextMenu.parentNode !== document.body) {
+            document.body.appendChild(contextMenu);
+        }
+        
+        // 캔버스 우클릭 이벤트
+        canvas.addEventListener('contextmenu', function(e) {
+            // 포스트잇이나 이미지 위에서 우클릭한 경우는 제외
+            if (e.target.closest('.gemini-post-it') || e.target.closest('.canvas-image')) {
+                return;
+            }
+            
+            // 캔버스 빈 곳에서만 메뉴 표시 (캔버스 자체나 캔버스 내 빈 공간에서만)
+            const clickedElement = e.target;
+            const isCanvas = clickedElement.id === 'canvas' || 
+                           clickedElement.classList.contains('gemini-canvas') || 
+                           clickedElement.closest('#canvas');
+            
+            if (!isCanvas) {
+                return;
+            }
+            
+            e.preventDefault();
+            
+            // 마우스 포인터의 뷰포트 좌표를 직접 가져오기 (clientX, clientY 사용)
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            
+            // 캔버스 내 상대 좌표 계산 (이미지 업로드 등에서 사용)
+            const canvasRect = canvas.getBoundingClientRect();
+            const relativeX = mouseX - canvasRect.left;
+            const relativeY = mouseY - canvasRect.top;
+            
+            // 마우스 좌표 저장 (뷰포트 좌표와 캔버스 상대 좌표 모두 저장)
+            contextMenuX = mouseX; // 뷰포트 좌표 (메뉴 위치용)
+            contextMenuY = mouseY; // 뷰포트 좌표 (메뉴 위치용)
+            
+            // 메뉴를 먼저 숨긴 상태에서 크기 계산
+            contextMenu.style.display = 'none';
+            contextMenu.style.position = 'fixed';
+            contextMenu.style.left = '-9999px';
+            contextMenu.style.top = '-9999px';
+            contextMenu.style.visibility = 'hidden';
+            contextMenu.style.display = 'block';
+            
+            // 강제 리플로우를 위해 offsetWidth 읽기
+            void contextMenu.offsetWidth;
+            
+            // 메뉴 크기 계산
+            const menuWidth = contextMenu.offsetWidth || 180;
+            const menuHeight = contextMenu.offsetHeight || 200;
+            
+            // 화면 크기 확인
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            // 메뉴 위치 계산 (마우스 포인터 위치를 기준으로 - clientX, clientY 직접 사용)
+            let menuX = mouseX;
+            let menuY = mouseY;
+            
+            // 화면 경계 체크 및 조정 (화면 밖으로 나가는 경우에만 조정)
+            if (menuX + menuWidth > windowWidth) {
+                menuX = windowWidth - menuWidth - 10;
+            }
+            if (menuX < 10) {
+                menuX = 10;
+            }
+            
+            if (menuY + menuHeight > windowHeight) {
+                menuY = windowHeight - menuHeight - 10;
+            }
+            if (menuY < 10) {
+                menuY = 10;
+            }
+            
+            // Context Menu 위치를 정확하게 설정 (뷰포트 절대 좌표 직접 사용)
+            contextMenu.style.left = menuX + 'px';
+            contextMenu.style.top = menuY + 'px';
+            contextMenu.style.visibility = 'visible';
+            contextMenu.style.display = 'block';
+        });
+        
+        // 메뉴 외부 클릭 시 닫기 (body로 이동했으므로 올바르게 작동)
+        document.addEventListener('click', function(e) {
+            // 메뉴 자체를 클릭한 경우는 제외
+            if (contextMenu.contains(e.target)) {
+                return;
+            }
+            // 메뉴가 표시되어 있을 때만 닫기
+            if (contextMenu.style.display === 'block') {
+                contextMenu.style.display = 'none';
+            }
+        });
+        
+        // 이미지 업로드 메뉴 항목
+        document.getElementById('contextMenuImageUpload').addEventListener('click', function() {
+            contextMenu.style.display = 'none';
+            // 숨겨진 파일 입력 생성
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none';
+            
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // 파일 크기 체크 (5MB 제한)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('이미지 크기는 5MB 이하여야 합니다.');
+                    return;
+                }
+                
+                // 캔버스 내 상대 좌표 계산 (이미 저장된 뷰포트 좌표 사용)
+                const canvasRect = canvas.getBoundingClientRect();
+                const relativeX = contextMenuX - canvasRect.left;
+                const relativeY = contextMenuY - canvasRect.top;
+                
+                // 좌표가 캔버스 범위 내에 있는지 확인
+                if (relativeX >= 0 && relativeY >= 0 && relativeX <= canvasRect.width && relativeY <= canvasRect.height) {
+                    // 새 포스트 생성 (이미지 포함)
+                    createPostWithImage(file, relativeX, relativeY);
+                } else {
+                    alert('캔버스 범위를 벗어난 위치입니다.');
+                }
+                
+                // 파일 입력 제거
+                document.body.removeChild(fileInput);
+            });
+            
+            document.body.appendChild(fileInput);
+            fileInput.click();
+        });
+        
+        // 텍스트 포스트 추가 메뉴 항목
+        document.getElementById('contextMenuTextPost').addEventListener('click', function() {
+            contextMenu.style.display = 'none';
+            
+            // 캔버스 내 상대 좌표 계산 (이미 저장된 뷰포트 좌표 사용)
+            const canvasRect = canvas.getBoundingClientRect();
+            const relativeX = contextMenuX - canvasRect.left;
+            const relativeY = contextMenuY - canvasRect.top;
+            
+            // 좌표가 캔버스 범위 내에 있는지 확인
+            if (relativeX >= 0 && relativeY >= 0 && relativeX <= canvasRect.width && relativeY <= canvasRect.height) {
+                // 새 텍스트 포스트 생성
+                createPostAtPosition(relativeX, relativeY);
+            } else {
+                alert('캔버스 범위를 벗어난 위치입니다.');
+            }
+        });
+        
+        // 캔버스 설정 메뉴 항목
+        document.getElementById('contextMenuCanvasSettings').addEventListener('click', function() {
+            contextMenu.style.display = 'none';
+            // 사이드바의 캔버스 메뉴 열기
+            const canvasMenu = document.getElementById('canvasMenu');
+            if (canvasMenu) {
+                const bsCollapse = new bootstrap.Collapse(canvasMenu, {
+                    toggle: true
+                });
+            }
+        });
+        
+        // 취소 메뉴 항목
+        document.getElementById('contextMenuCancel').addEventListener('click', function() {
+            contextMenu.style.display = 'none';
+        });
+    }
+    
+    // 이미지와 함께 포스트 생성 함수
+    function createPostWithImage(imageFile, x, y) {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        formData.append('position_x', x);
+        formData.append('position_y', y);
+        // 지침 2: board_id 추가 (서버 측 유효성 검사를 위해 필수)
+        formData.append('board_id', boardId);
+        
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) return;
+        formData.append('csrfmiddlewaretoken', csrfToken);
+        
+        fetch('/collaboration/post/create/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || '서버 오류가 발생했습니다.');
+                }).catch(() => {
+                    throw new Error('서버 오류가 발생했습니다. (HTTP ' + response.status + ')');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // 성공 후 처리: addPostToDOM 함수로 이미지를 화면에 그림
+                addPostToDOM(data.post, false);
+            } else {
+                if (data.message === 'login_required') {
+                    if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
+                        window.location.href = data.login_url || '/accounts/login/';
+                    }
+                    return;
+                }
+                alert('오류: ' + (data.message || '저장 실패'));
+                if (data.errors) {
+                    console.error(data.errors);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('오류: ' + error.message);
+        });
+    }
+    
+    // 특정 위치에 텍스트 포스트 생성 함수
+    function createPostAtPosition(x, y) {
+        const formData = new FormData();
+        formData.append('content', '');
+        formData.append('position_x', x);
+        formData.append('position_y', y);
+        
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) return;
+        formData.append('csrfmiddlewaretoken', csrfToken);
+        
+        fetch('/collaboration/post/create/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || '서버 오류가 발생했습니다.');
+                }).catch(() => {
+                    throw new Error('서버 오류가 발생했습니다. (HTTP ' + response.status + ')');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // 성공 후 처리: addPostToDOM 함수로 포스트잇을 화면에 그림
+                addPostToDOM(data.post, true); // true = 편집 모드로 추가
+                
+                // 즉시 편집 모드: 생성된 포스트잇의 내용 영역을 찾아 focus() 강제 실행
+                setTimeout(() => {
+                    const newPost = document.querySelector(`[data-post-id="${data.post.id}"]`);
+                    if (newPost) {
+                        const contentElement = newPost.querySelector('.post-content');
+                        if (contentElement) {
+                            contentElement.focus();
+                            // 커서를 끝으로 이동
+                            const range = document.createRange();
+                            range.selectNodeContents(contentElement);
+                            range.collapse(false);
+                            const selection = window.getSelection();
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                        }
+                    }
+                }, 50);
+            } else {
+                if (data.message === 'login_required') {
+                    if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
+                        window.location.href = data.login_url || '/accounts/login/';
+                    }
+                    return;
+                }
+                alert('오류: ' + (data.message || '저장 실패'));
+                if (data.errors) {
+                    console.error(data.errors);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('오류: ' + error.message);
+        });
+    }
+    
+    // 포스트잇 크기를 내용에 맞게 자동 조절하는 함수
+    function autoResizePostIt(postElement) {
+        if (!postElement) return;
+        
+        // 현재 포스트잇의 최소 크기 (기본 요소 포함: 사용자 정보, 액션 버튼 등)
+        const minWidth = 220;
+        const minHeight = 160; // 기본 높이: 사용자 정보(25px) + 패딩(36px) + 액션 버튼(40px) + 여백(59px)
+        const padding = 36; // 좌우 패딩 18px * 2
+        const baseVerticalPadding = 36; // 상하 패딩 18px * 2
+        
+        // 기본 요소 높이 (항상 포함)
+        const userInfoHeight = 25; // 사용자 정보
+        const actionButtonHeight = 40; // 액션 버튼
+        const baseContentHeight = 20; // 기본 콘텐츠 영역
+        
+        // 최소 높이는 기본 요소들을 포함한 높이
+        let requiredWidth = minWidth;
+        let requiredHeight = minHeight; // 기본 높이로 시작
+        
+        // 내용 요소 확인
+        const contentElement = postElement.querySelector('.post-content');
+        let hasRealContent = false;
+        let textHeight = 0;
+        
+        if (contentElement) {
+            // 텍스트 내용 확인 (플레이스홀더 제외)
+            const text = contentElement.textContent || '';
+            const cleanText = text.trim();
+            
+            // 실제 내용이 있는지 확인
+            hasRealContent = cleanText !== '' && 
+                            cleanText !== '내용을 입력하세요...' &&
+                            !(cleanText.startsWith('{') && cleanText.includes('metadata'));
+            
+            if (hasRealContent) {
+                // 텍스트 내용에 따른 크기 계산
+                const lines = text.split('\n').filter(line => line.trim() !== '').length || 1;
+                const longestLine = Math.max(...text.split('\n').map(line => line.length), 0);
+                
+                // 텍스트 기반 크기 계산 (더 정확한 계산)
+                const textWidth = Math.max(longestLine * 7, 100); // 대략 문자당 7px
+                textHeight = Math.max(lines * 22, 22); // 대략 줄당 22px (line-height 고려)
+                
+                requiredWidth = Math.max(requiredWidth, textWidth + padding);
+                // 텍스트 높이만 추가 (기본 높이에 텍스트 높이 추가)
+                requiredHeight = minHeight + textHeight - baseContentHeight;
+            }
+        }
+        
+        // 버그 2: 이미지 확인 및 크기 계산
+        const imageContainer = postElement.querySelector('.post-image-container');
+        let hasImage = false;
+        let imageHeight = 0;
+        
+        if (imageContainer) {
+            const image = imageContainer.querySelector('img');
+            if (image) {
+                hasImage = true;
+                
+                // 버그 2: 이미지 크기 계산 함수 (로드 완료 여부와 관계없이 호출 가능)
+                const calculateImageSize = function(img) {
+                    let imgWidth = 0;
+                    let imgHeight = 0;
+                    
+                    // 이미지가 완전히 로드되었는지 확인
+                    if (img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+                        // naturalWidth/Height 사용 (원본 크기)
+                        imgWidth = img.naturalWidth;
+                        imgHeight = img.naturalHeight;
+                    } else {
+                        // 아직 로드되지 않았으면 실제 렌더링 크기 사용
+                        const imgRect = img.getBoundingClientRect();
+                        if (imgRect.width > 0 && imgRect.height > 0) {
+                            imgWidth = imgRect.width;
+                            imgHeight = imgRect.height;
+                        } else {
+                            // 크기를 알 수 없으면 기본값 사용
+                            return { width: 0, height: 0 };
+                        }
+                    }
+                    
+                    // 포스트잇의 실제 내부 콘텐츠 너비 계산
+                    const maxContentWidth = minWidth - padding; // 220 - 36 = 184px
+                    const currentContentWidth = requiredWidth - padding;
+                    const availableWidth = Math.min(currentContentWidth, maxContentWidth);
+                    
+                    // 이미지가 포스트잇 내부 콘텐츠 너비를 초과하지 않도록 조절
+                    const imageDisplayWidth = Math.min(imgWidth, availableWidth);
+                    // 가로세로 비율 유지하여 높이 계산
+                    const imageDisplayHeight = (imgHeight / imgWidth) * imageDisplayWidth;
+                    
+                    return { width: imageDisplayWidth, height: imageDisplayHeight };
+                };
+                
+                // 이미지 크기 계산 시도
+                const imageSize = calculateImageSize(image);
+                
+                if (imageSize.width > 0 && imageSize.height > 0) {
+                    // 이미지 크기가 계산된 경우
+                    imageHeight = imageSize.height;
+                    
+                    // 포스트잇 너비는 이미지가 필요로 하는 너비 + 패딩으로 설정
+                    requiredWidth = Math.max(requiredWidth, imageSize.width + padding);
+                    // 이미지 높이 추가 (텍스트가 있으면 텍스트 높이에 추가, 없으면 기본 높이에 추가)
+                    if (hasRealContent) {
+                        requiredHeight = requiredHeight + imageHeight + 10; // 이미지 + 여백
+                    } else {
+                        requiredHeight = minHeight + imageHeight + 10; // 기본 높이 + 이미지 + 여백
+                    }
+                } else {
+                    // 버그 2: 이미지가 아직 로드되지 않았으면 강력한 로드 이벤트 핸들러 등록
+                    const handleImageLoad = function() {
+                        // 이미지 로드 완료 후 크기 재계산
+                        const loadedImageSize = calculateImageSize(image);
+                        if (loadedImageSize.width > 0 && loadedImageSize.height > 0) {
+                            // autoResizePostIt을 다시 호출하여 크기 조절
+                            autoResizePostIt(postElement);
+                        }
+                        // 이벤트 핸들러 제거 (중복 호출 방지)
+                        image.removeEventListener('load', handleImageLoad);
+                        image.removeEventListener('error', handleImageError);
+                    };
+                    
+                    const handleImageError = function() {
+                        console.warn('이미지 로드 실패:', image.src);
+                        image.removeEventListener('load', handleImageLoad);
+                        image.removeEventListener('error', handleImageError);
+                    };
+                    
+                    // 여러 이벤트 리스너 등록 (로드 완료 보장)
+                    if (image.complete) {
+                        // 이미 로드 완료된 경우 즉시 처리
+                        setTimeout(handleImageLoad, 0);
+                    } else {
+                        image.addEventListener('load', handleImageLoad, { once: true });
+                        image.addEventListener('error', handleImageError, { once: true });
+                    }
+                }
+            }
+        }
+        
+        // 파일 링크 확인 (파일이 있을 때만 높이 추가)
+        const fileContainer = postElement.querySelector('.post-file-container');
+        if (fileContainer) {
+            requiredHeight += 30; // 파일 링크 높이
+        }
+        
+        // 계산된 크기 적용
+        const currentWidth = parseFloat(postElement.style.width) || minWidth;
+        const currentHeight = parseFloat(postElement.style.height) || minHeight;
+        
+        // 실제 내용이나 이미지가 있을 때만 크기 조절
+        if (hasRealContent || hasImage) {
+            const finalWidth = Math.max(requiredWidth, minWidth);
+            const finalHeight = Math.max(requiredHeight, minHeight);
+            
+            postElement.style.width = finalWidth + 'px';
+            postElement.style.height = finalHeight + 'px';
+            
+            // 서버에 크기 업데이트
+            const postId = postElement.getAttribute('data-post-id');
+            if (postId) {
+                updatePostSize(postId, finalWidth, finalHeight);
+            }
+        } else {
+            // 내용이 없으면 최소 크기만 유지 (세로로 길어지는 현상 방지)
+            postElement.style.width = minWidth + 'px';
+            postElement.style.height = minHeight + 'px';
+        }
+    }
     
     // 포스트 상호작용 설정 (더블 클릭, 클릭 시 z-index 증가, contenteditable 편집)
     function setupPostInteractions(postElement) {
@@ -1228,6 +2014,18 @@
                                     postElement.insertBefore(imageContainer, contentElement);
                                 }
                                 imageContainer.innerHTML = `<img src="${imageUrlWithTimestamp}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;" onerror="this.src='${data.image_url}';">`;
+                                
+                                // 이미지 로드 후 포스트잇 크기 자동 조절
+                                const img = imageContainer.querySelector('img');
+                                if (img) {
+                                    img.onload = function() {
+                                        autoResizePostIt(postElement);
+                                    };
+                                    // 이미 이미 로드된 경우
+                                    if (img.complete) {
+                                        autoResizePostIt(postElement);
+                                    }
+                                }
                             }
                         })
                         .catch(error => {
@@ -1300,6 +2098,18 @@
                                 postElement.insertBefore(imageContainer, contentElement);
                             }
                             imageContainer.innerHTML = `<img src="${imageUrlWithTimestamp}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;" onerror="this.src='${data.image_url}';">`;
+                            
+                            // 이미지 로드 후 포스트잇 크기 자동 조절
+                            const img = imageContainer.querySelector('img');
+                            if (img) {
+                                img.onload = function() {
+                                    autoResizePostIt(postElement);
+                                };
+                                // 이미 이미 로드된 경우
+                                if (img.complete) {
+                                    autoResizePostIt(postElement);
+                                }
+                            }
                         }
                     })
                     .catch(error => {
@@ -1342,8 +2152,14 @@
             }
         });
         
+        // 입력 시 포스트잇 크기 자동 조절
+        contentElement.addEventListener('input', function() {
+            autoResizePostIt(postElement);
+        });
+        
         // blur 시 플레이스홀더 표시 및 내용 저장 (자동 저장)
         contentElement.addEventListener('blur', function() {
+            autoResizePostIt(postElement);
             const postId = postElement.getAttribute('data-post-id');
             const newContent = this.textContent.trim();
             
@@ -1538,6 +2354,18 @@
                     }
                     // 기존 이미지가 있으면 제거하고 새 이미지 추가
                     imageContainer.innerHTML = `<img src="${imageUrlWithTimestamp}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;" onerror="this.src='${data.image_url}';">`;
+                    
+                    // 이미지 로드 후 포스트잇 크기 자동 조절
+                    const img = imageContainer.querySelector('img');
+                    if (img) {
+                        img.onload = function() {
+                            autoResizePostIt(postElement);
+                        };
+                        // 이미 이미 로드된 경우
+                        if (img.complete) {
+                            autoResizePostIt(postElement);
+                        }
+                    }
                 }
             } else {
                 alert(data.message || '이미지 업로드에 실패했습니다.');
@@ -1637,6 +2465,64 @@
     }
     
     // 포스트 삭제 함수
+    // 캔버스 이미지 삭제 함수 (템플릿에서 호출)
+    function deleteCanvasImageFromTemplate(postId) {
+        if (confirm('정말로 이 이미지를 삭제하시겠습니까?')) {
+            const formData = new FormData();
+            const csrfToken = getCSRFToken();
+            if (!csrfToken) return;
+            formData.append('csrfmiddlewaretoken', csrfToken);
+            
+            // fetch API 사용
+            fetch('/collaboration/post/' + postId + '/delete/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || '서버 오류가 발생했습니다.');
+                    }).catch(() => {
+                        throw new Error('서버 오류가 발생했습니다. (HTTP ' + response.status + ')');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // DOM에서 이미지 제거
+                    const imageElement = document.querySelector(`[data-post-id="${postId}"].canvas-image`);
+                    if (imageElement) {
+                        imageElement.remove();
+                    }
+                    
+                    // 포스트가 없으면 빈 상태 메시지 표시
+                    const canvas = document.getElementById('canvas');
+                    const remainingPosts = canvas.querySelectorAll('.gemini-post-it, .canvas-image');
+                    if (remainingPosts.length === 0) {
+                        const emptyState = document.createElement('div');
+                        emptyState.className = 'gemini-empty-state';
+                        emptyState.innerHTML = `
+                            <i class="bi bi-inbox"></i>
+                            <p class="mt-3 mb-0">등록된 포스트가 없습니다. 왼쪽 팔레트에서 색상을 드래그하여 포스트를 만들어보세요.</p>
+                        `;
+                        canvas.appendChild(emptyState);
+                    }
+                } else {
+                    alert('오류: ' + (data.message || '삭제 실패'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('오류: ' + error.message);
+            });
+        }
+    }
+    
     function deletePost(event, postId) {
         event.stopPropagation();
         event.preventDefault();
@@ -1676,7 +2562,7 @@
                     
                     // 포스트가 없으면 빈 상태 메시지 표시
                     const canvas = document.getElementById('canvas');
-                    const remainingPosts = canvas.querySelectorAll('.gemini-post-it');
+                    const remainingPosts = canvas.querySelectorAll('.gemini-post-it, .canvas-image');
                     if (remainingPosts.length === 0) {
                         const emptyState = document.createElement('div');
                         emptyState.className = 'gemini-empty-state';
@@ -1867,7 +2753,7 @@
         });
     }
     
-    // 새 포스트를 DOM에 추가하는 함수
+    // 새 포스트를 DOM에 추가하는 함수 (포스트잇과 이미지 분리)
     function addPostToDOM(post, isEditMode = false) {
         const canvas = document.getElementById('canvas');
         
@@ -1877,25 +2763,140 @@
             noPostsMsg.remove();
         }
         
-        // 새 포스트 요소 생성
-        const newPost = document.createElement('div');
-        newPost.className = 'gemini-post-it post-' + (post.color || 'yellow');
-        newPost.setAttribute('data-post-id', post.id);
         // 위치 좌표를 숫자로 변환하여 적용 (기본값 0)
-        const posX = (post.position_x !== undefined && post.position_x !== null && !isNaN(post.position_x)) ? Number(post.position_x) : 0;
-        const posY = (post.position_y !== undefined && post.position_y !== null && !isNaN(post.position_y)) ? Number(post.position_y) : 0;
-        const zIndex = (post.z_index !== undefined && post.z_index !== null) ? Number(post.z_index) : 1;
-        newPost.style.left = posX + 'px';
-        newPost.style.top = posY + 'px';
-        newPost.style.zIndex = zIndex;
-        
+            const posX = (post.position_x !== undefined && post.position_x !== null && !isNaN(post.position_x)) ? Number(post.position_x) : 0;
+            const posY = (post.position_y !== undefined && post.position_y !== null && !isNaN(post.position_y)) ? Number(post.position_y) : 0;
+            const zIndex = (post.z_index !== undefined && post.z_index !== null) ? Number(post.z_index) : 1;
+            
         // maxZIndex 업데이트
         if (zIndex > maxZIndex) {
             maxZIndex = zIndex;
         }
         
-        // 내용이 비어있으면 플레이스홀더 표시
-        const contentText = post.content || '';
+        // 내용 텍스트 확인 (메타데이터 필터링)
+        let contentText = post.content || '';
+        let isMetadataOnly = false;
+        // 메타데이터만 있는 경우 필터링
+        if (contentText && contentText.trim().startsWith('{') && contentText.includes('metadata')) {
+            try {
+                const metadata = JSON.parse(contentText);
+                if (metadata.metadata && Object.keys(metadata).length === 1) {
+                    // 메타데이터만 있는 경우
+                    contentText = '';
+                    isMetadataOnly = true;
+                }
+            } catch (e) {
+                // JSON 파싱 실패 시 그대로 사용
+            }
+        }
+        
+        // 이미지만 있고 텍스트가 없는 경우에만 .canvas-image 개체 생성
+        // 메타데이터만 있는 경우도 이미지 전용으로 처리
+        // 그 외의 경우(텍스트가 있거나 이미지와 텍스트가 모두 있으면) .gemini-post-it 생성
+        if (post.image_url && (!contentText || isMetadataOnly)) {
+            // 이미지 전용 개체 생성
+            const canvasImage = document.createElement('div');
+            canvasImage.className = 'canvas-image';
+            canvasImage.setAttribute('data-post-id', post.id);
+            canvasImage.setAttribute('data-image-id', post.id);
+            canvasImage.style.left = posX + 'px';
+            canvasImage.style.top = posY + 'px';
+            canvasImage.style.zIndex = zIndex;
+            
+            // 삭제 버튼
+            const deleteBtnHtml = `<button class="canvas-image-delete" onclick="deleteCanvasImageFromTemplate(${post.id})" title="삭제">
+                    <i class="bi bi-x"></i>
+                </button>`;
+            
+            // 이미지 요소 생성 (초기에는 숨김 상태로 생성)
+            const img = document.createElement('img');
+            img.src = post.image_url;
+            img.alt = '캔버스 이미지';
+            img.style.display = 'none'; // 이미지가 로드될 때까지 숨김
+            img.style.borderRadius = '4px';
+            
+            // 이미지 로드 완료 후 크기 자동 조정 (원본 비율 유지)
+            img.onload = function() {
+                // 원본 이미지 크기 가져오기
+                const naturalWidth = img.naturalWidth;
+                const naturalHeight = img.naturalHeight;
+                
+                if (naturalWidth > 0 && naturalHeight > 0) {
+                    // 원본 비율 계산
+                    const aspectRatio = naturalWidth / naturalHeight;
+                    
+                    // 최대 폭 제한 (300px)
+                    const maxWidth = 300;
+                    let finalWidth = naturalWidth;
+                    let finalHeight = naturalHeight;
+                    
+                    // 이미지가 최대 폭보다 크면 비율 유지하며 축소
+                    if (naturalWidth > maxWidth) {
+                        finalWidth = maxWidth;
+                        finalHeight = maxWidth / aspectRatio; // 비율 유지하여 높이 계산
+                    } else {
+                        // 원본이 작으면 원본 크기 사용 (비율 유지)
+                        finalWidth = naturalWidth;
+                        finalHeight = naturalHeight;
+                    }
+                    
+                    // 컨테이너 크기를 이미지 크기에 맞게 조정 (원본 비율 유지, 잘림 방지)
+                    canvasImage.style.width = finalWidth + 'px';
+                    canvasImage.style.height = finalHeight + 'px';
+                    
+                    // 이미지 크기를 컨테이너에 맞게 설정 (비율 유지)
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'contain'; // contain 사용하여 잘림 방지
+                    img.style.display = 'block'; // 이미지 표시
+                    
+                    // 서버에 변경된 크기 저장
+                    updatePostSize(post.id, finalWidth, finalHeight);
+                } else {
+                    // 이미지 크기를 알 수 없는 경우 기본값 사용
+                    canvasImage.style.width = '300px';
+                    canvasImage.style.height = '300px';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'contain';
+                    img.style.display = 'block';
+                }
+            };
+            
+            // 이미지 로드 실패 시 기본 크기 유지
+            img.onerror = function() {
+                console.error('이미지 로드 실패:', post.image_url);
+                // 기본 크기 설정
+                canvasImage.style.width = '300px';
+                canvasImage.style.height = '300px';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'contain';
+                img.style.display = 'block';
+            };
+            
+            // 초기 크기는 임시로 설정 (이미지 로드 후 실제 크기로 조정됨)
+            canvasImage.style.width = '300px';
+            canvasImage.style.height = '300px';
+            
+            canvasImage.innerHTML = deleteBtnHtml;
+            canvasImage.appendChild(img);
+            
+            canvas.appendChild(canvasImage);
+            
+            // 이미지 개체에 드래그 및 리사이즈 기능 적용
+            makeDraggable(canvasImage);
+            makeResizable(canvasImage);
+            bringToFront(canvasImage);
+        } else {
+            // 텍스트 포스트잇 생성 (이미지가 있으면 포스트잇 내부에 이미지 포함)
+        const newPost = document.createElement('div');
+        newPost.className = 'gemini-post-it post-' + (post.color || 'yellow');
+        newPost.setAttribute('data-post-id', post.id);
+        newPost.style.left = posX + 'px';
+        newPost.style.top = posY + 'px';
+        newPost.style.zIndex = zIndex;
+        
         const displayContent = contentText || (isEditMode ? '내용을 입력하세요...' : '');
         
         // 삭제 버튼 (새로 생성된 포스트는 항상 작성자이므로 표시)
@@ -1903,7 +2904,7 @@
                 <i class="bi bi-x"></i>
             </button>`;
         
-        // 이미지 HTML
+        // 포스트잇 내부에 이미지 표시 (이미지가 있는 경우)
         const imageHtml = post.image_url ? `<div class="post-image-container mb-2">
                 <img src="${post.image_url}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">
             </div>` : '';
@@ -1938,10 +2939,46 @@
         
         canvas.appendChild(newPost);
         
-        // 새로 추가된 포스트에 드래그 기능 및 상호작용 적용
+            // 텍스트 포스트잇에 드래그 기능 및 상호작용 적용
         makeDraggable(newPost);
+        makeResizable(newPost);
         setupPostInteractions(newPost);
         bringToFront(newPost);
+        
+        // 버그 2: 이미지가 있는 경우 이미지 로드 완료 후 크기 자동 조절
+        if (post.image_url) {
+            const imageElement = newPost.querySelector('.post-image-container img');
+            if (imageElement) {
+                // 이미지 로드 완료 핸들러 (강력한 구현)
+                const handleImageLoadForResize = function() {
+                    // 이미지 로드 완료 후 포스트잇 크기 자동 조절
+                    autoResizePostIt(newPost);
+                    // 이벤트 핸들러 제거 (중복 호출 방지)
+                    imageElement.removeEventListener('load', handleImageLoadForResize);
+                    imageElement.removeEventListener('error', handleImageErrorForResize);
+                };
+                
+                const handleImageErrorForResize = function() {
+                    console.warn('이미지 로드 실패:', imageElement.src);
+                    imageElement.removeEventListener('load', handleImageLoadForResize);
+                    imageElement.removeEventListener('error', handleImageErrorForResize);
+                };
+                
+                // 이미지가 이미 로드된 경우 즉시 처리
+                if (imageElement.complete && imageElement.naturalWidth > 0) {
+                    // 다음 프레임에서 실행하여 DOM 렌더링 완료 보장
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            autoResizePostIt(newPost);
+                        }, 0);
+                    });
+                } else {
+                    // 이미지 로드 대기
+                    imageElement.addEventListener('load', handleImageLoadForResize, { once: true });
+                    imageElement.addEventListener('error', handleImageErrorForResize, { once: true });
+                }
+            }
+        }
         
         // 편집 모드인 경우 포커스 및 선택 (바로 글을 쓸 수 있도록)
         if (isEditMode) {
@@ -1962,7 +2999,8 @@
                     const selection = window.getSelection();
                     selection.removeAllRanges();
                     selection.addRange(range);
-                }, 50); // 더 빠른 반응을 위해 50ms로 단축
+                    }, 50);
+                }
             }
         }
     }
@@ -2043,6 +3081,204 @@
         target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         target.setAttribute('data-x', x);
         target.setAttribute('data-y', y);
+    }
+    
+    // 포스트잇 리사이즈 가능하게 만드는 함수 (테두리 드래그)
+    function makeResizable(element) {
+        // interact.js가 로드되지 않았으면 리턴
+        if (typeof interact === 'undefined') {
+            console.warn('interact.js가 로드되지 않아 리사이즈 기능을 활성화할 수 없습니다.');
+            return;
+        }
+        
+        // 이미 리사이즈 기능이 추가되었는지 확인
+        if (element.getAttribute('data-resizable-setup') === 'true') {
+            return; // 이미 설정되었으면 중복 설정 방지
+        }
+        
+        element.setAttribute('data-resizable-setup', 'true');
+        
+        // 이미지 여부 감지
+        const img = element.querySelector('img');
+        const hasImage = img !== null && (img.src || img.getAttribute('src'));
+        
+        // 이미지가 있는 경우 원본 비율 계산 및 저장
+        let aspectRatio = null;
+        if (hasImage) {
+            // 이미지가 이미 로드된 경우
+            if (img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+                aspectRatio = img.naturalWidth / img.naturalHeight;
+                // 비율 정보를 element에 저장
+                element.setAttribute('data-aspect-ratio', aspectRatio.toString());
+            } else {
+                // 이미지 로드 대기
+                img.addEventListener('load', function() {
+                    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                        aspectRatio = img.naturalWidth / img.naturalHeight;
+                        element.setAttribute('data-aspect-ratio', aspectRatio.toString());
+                        // 리사이즈 설정 재적용 (비율 정보 업데이트)
+                        element.removeAttribute('data-resizable-setup');
+                        makeResizable(element);
+                    }
+                }, { once: true });
+            }
+        }
+        
+        // Modifiers 설정
+        const modifiers = [];
+        
+        // 최소 크기 제한 (가로/세로 제한 없음)
+        modifiers.push(
+            interact.modifiers.restrictSize({
+                min: { width: 100, height: 100 },
+                max: { width: Infinity, height: Infinity }  // 가로/세로 제한 없음
+            })
+        );
+        
+        // interact.js의 resize 기능 사용 - 모든 방향 자유롭게 리사이즈 가능
+        interact(element).resizable({
+            // 모든 방향(상하좌우) 리사이즈 가능하도록 설정
+            edges: {
+                left: true,
+                right: true,
+                top: true,
+                bottom: true
+            },
+            // 테두리 10px 영역에서만 리사이즈 핸들 활성화
+            margin: 10,
+            // Modifiers 적용
+            modifiers: modifiers,
+            inertia: false,
+            listeners: {
+                start: function(event) {
+                    // 리사이즈 시작 시 z-index 증가
+                    bringToFront(event.target);
+                    event.target.classList.add('resizing');
+                    
+                    // CSS max-width 제한 강제 해제
+                    event.target.style.maxWidth = 'none';
+                    event.target.style.maxHeight = 'none';
+                },
+                move: function(event) {
+                    const target = event.target;
+                    
+                    // CSS max-width 제한 강제 해제 (리사이즈 중 계속 적용)
+                    target.style.maxWidth = 'none';
+                    target.style.maxHeight = 'none';
+                    
+                    // 현재 크기 가져오기 (style 또는 기본값)
+                    let currentWidth = parseFloat(target.style.width) || 
+                                      parseFloat(getComputedStyle(target).width) || 
+                                      220;
+                    let currentHeight = parseFloat(target.style.height) || 
+                                       parseFloat(getComputedStyle(target).height) || 
+                                       160;
+                    
+                    // 이미지 비율 정보 가져오기
+                    const savedAspectRatio = target.getAttribute('data-aspect-ratio');
+                    const hasImageRatio = savedAspectRatio !== null && hasImage;
+                    const aspectRatio = hasImageRatio ? parseFloat(savedAspectRatio) : null;
+                    
+                    // 가로, 세로 모두 리사이즈 가능
+                    let newWidth = currentWidth + event.deltaRect.width;
+                    let newHeight = currentHeight + event.deltaRect.height;
+                    
+                    // 이미지가 있는 경우 비율 유지
+                    if (hasImageRatio && aspectRatio) {
+                        // 어떤 방향으로 리사이즈했는지 확인
+                        const widthDelta = Math.abs(event.deltaRect.width);
+                        const heightDelta = Math.abs(event.deltaRect.height);
+                        
+                        // 더 많이 변경된 방향을 기준으로 비율 계산
+                        if (widthDelta > heightDelta) {
+                            // 가로 방향으로 더 많이 변경됨 -> 세로를 가로에 맞춤
+                            newHeight = newWidth / aspectRatio;
+                        } else {
+                            // 세로 방향으로 더 많이 변경됨 -> 가로를 세로에 맞춤
+                            newWidth = newHeight * aspectRatio;
+                        }
+                    }
+                    
+                    // 최소 크기 보호
+                    const minWidth = 100;
+                    const minHeight = 100;
+                    const finalWidth = Math.max(newWidth, minWidth);
+                    const finalHeight = Math.max(newHeight, minHeight);
+                    
+                    // 이미지가 있는 경우 최종 크기도 비율 유지
+                    let finalWidthAdjusted = finalWidth;
+                    let finalHeightAdjusted = finalHeight;
+                    if (hasImageRatio && aspectRatio) {
+                        // 최소 크기 중 더 큰 값을 기준으로 비율 계산
+                        if (finalWidth / aspectRatio >= minHeight) {
+                            finalHeightAdjusted = finalWidth / aspectRatio;
+                        } else {
+                            finalWidthAdjusted = finalHeight * aspectRatio;
+                        }
+                    }
+                    
+                    // 가로, 세로 크기 모두 적용
+                    target.style.width = finalWidthAdjusted + 'px';
+                    target.style.height = finalHeightAdjusted + 'px';
+                    
+                    // 위치 조정 (왼쪽/위쪽에서 리사이즈할 때)
+                    if (event.deltaRect.left !== 0) {
+                        const currentLeft = parseFloat(target.style.left) || 0;
+                        target.style.left = (currentLeft + event.deltaRect.left) + 'px';
+                    }
+                    if (event.deltaRect.top !== 0) {
+                        const currentTop = parseFloat(target.style.top) || 0;
+                        target.style.top = (currentTop + event.deltaRect.top) + 'px';
+                    }
+                },
+                end: function(event) {
+                    const target = event.target;
+                    target.classList.remove('resizing');
+                    
+                    // CSS max-width 제한 해제 유지
+                    target.style.maxWidth = 'none';
+                    target.style.maxHeight = 'none';
+                    
+                    // 서버에 크기 업데이트 (가로, 세로 모두)
+                    const postId = target.getAttribute('data-post-id');
+                    if (postId) {
+                        const width = parseFloat(target.style.width) || 220;
+                        const height = parseFloat(target.style.height) || 
+                                      parseFloat(getComputedStyle(target).height) || 
+                                      160;
+                        updatePostSize(postId, width, height);
+                    }
+                }
+            }
+        });
+    }
+    
+    // 포스트 크기 업데이트 함수
+    function updatePostSize(postId, width, height) {
+        const formData = new FormData();
+        formData.append('width', width);
+        formData.append('height', height);
+        
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) return;
+        
+        fetch('/collaboration/post/' + postId + '/update/', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('포스트 크기가 업데이트되었습니다.');
+            }
+        })
+        .catch(error => {
+            console.error('포스트 크기 업데이트 오류:', error);
+        });
     }
 
     // 포스트 위치 업데이트 함수

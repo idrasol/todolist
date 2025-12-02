@@ -98,6 +98,8 @@ class Post(models.Model):
     z_index = models.IntegerField(default=1, verbose_name='레이어 순서')
     image = models.ImageField(upload_to='posts/', null=True, blank=True, verbose_name='이미지')
     attached_file = models.FileField(upload_to='files/', null=True, blank=True, verbose_name='첨부 파일')
+    likes = models.IntegerField(default=0, verbose_name='좋아요 수')
+    dislikes = models.IntegerField(default=0, verbose_name='싫어요 수')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -108,4 +110,28 @@ class Post(models.Model):
 
     def __str__(self):
         return f"{self.user.username}의 포스트 - {self.content[:50]}"
+
+
+class Comment(models.Model):
+    """포스트 댓글 모델"""
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    content = models.TextField(verbose_name='댓글 내용')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='작성일')
+
+    class Meta:
+        verbose_name = '댓글'
+        verbose_name_plural = '댓글들'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.author.username}의 댓글 - {self.content[:30]}"
 

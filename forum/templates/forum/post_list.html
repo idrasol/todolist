@@ -255,11 +255,11 @@
         font-weight: 600;
     }
     
-    /* 모바일 대응 */
+    /* 모바일에서도 데스크탑 레이아웃 유지 */
     @media (max-width: 768px) {
         .forum-item-content {
             flex-direction: row;
-            gap: 1rem;
+            gap: 1.5rem;
         }
         
         .forum-item-right {
@@ -268,7 +268,7 @@
         }
         
         .forum-item-title {
-            font-size: 1rem;
+            font-size: 1.25rem;
         }
         
         .forum-actions {
@@ -280,7 +280,7 @@
             max-width: 100%;
             width: 100%;
             flex: 1;
-            min-width: 200px;
+            min-width: 300px;
         }
         
         .category-tabs {
@@ -288,10 +288,10 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        /* 모바일에서도 가로 레이아웃 유지 */
+        /* 모바일에서도 데스크탑과 동일한 패딩 유지 */
         .container-fluid.px-0 > .px-3 {
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
     }
     

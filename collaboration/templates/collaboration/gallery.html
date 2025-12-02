@@ -28,35 +28,198 @@
         font-size: 1.1rem;
     }
     
-    /* Pinterest 스타일 Masonry 레이아웃 */
-    .gallery-grid {
+    /* 사이드바 스타일 */
+    .gallery-sidebar {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e8eaed;
+        margin-bottom: 1rem;
+    }
+    
+    .gallery-sidebar .form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+    
+    .gallery-sidebar .form-select {
+        background: white;
+        color: #2d3748;
+        border: 2px solid #e8eaed;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .gallery-sidebar .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    /* Pinterest 스타일 Masonry 레이아웃 (기본) */
+    .gallery-layout-masonry.gallery-grid {
         display: block;
         column-count: 4;
         column-gap: 1.5rem;
         padding: 0 0.5rem 3rem;
     }
     
-    /* 반응형 분기점 */
+    /* 반응형 분기점 - 모바일에서도 데스크탑 레이아웃 유지 */
     @media (max-width: 1200px) {
-        .gallery-grid {
-            column-count: 3;
+        .gallery-layout-masonry.gallery-grid {
+            column-count: 4;
         }
     }
     
     @media (max-width: 768px) {
-        .gallery-grid {
-            column-count: 2;
-            column-gap: 0.75rem;
+        /* 모바일에서도 데스크탑과 동일한 레이아웃 유지 */
+        .gallery-layout-masonry.gallery-grid {
+            column-count: 4;
+            column-gap: 1.5rem;
             padding: 0 0.5rem 3rem;
+        }
+        
+        /* 모바일에서도 가로 레이아웃 유지 */
+        .row.gx-0 {
+            flex-direction: row;
+            flex-wrap: wrap;
+            overflow-x: visible;
+        }
+        
+        .row.gx-0 > .col-12 {
+            flex: 1 1 auto;
+        }
+        
+        .gallery-sidebar {
+            margin-bottom: 1rem;
+            min-width: auto;
+        }
+        
+        .col-12.col-md-9.col-lg-10 {
+            min-width: auto;
         }
     }
     
     @media (max-width: 576px) {
-        .gallery-grid {
-            column-count: 2;
-            column-gap: 0.5rem;
-            padding: 0 0.25rem 3rem;
+        /* 작은 화면에서도 데스크탑 레이아웃 유지 */
+        .gallery-layout-masonry.gallery-grid {
+            column-count: 4;
+            column-gap: 1.5rem;
+            padding: 0 0.5rem 3rem;
         }
+        
+        .gallery-sidebar {
+            min-width: auto;
+        }
+    }
+    
+    /* 그리드 레이아웃 */
+    .gallery-layout-grid.gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+        column-count: unset;
+        padding: 0 0.5rem 3rem;
+    }
+    
+    /* 리스트 레이아웃 */
+    .gallery-layout-list.gallery-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        column-count: unset;
+        padding: 0 0.5rem 3rem;
+    }
+    
+    .gallery-layout-list .gallery-item {
+        display: flex;
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .gallery-layout-list .gallery-card {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+    }
+    
+    .gallery-layout-list .gallery-thumbnail {
+        width: 200px;
+        min-width: 200px;
+        height: 150px;
+        padding-bottom: 0;
+        border-radius: 12px 0 0 12px;
+    }
+    
+    .gallery-layout-list .gallery-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    /* 컴팩트 레이아웃 */
+    .gallery-layout-compact.gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.75rem;
+        column-count: unset;
+        padding: 0 0.5rem 3rem;
+    }
+    
+    .gallery-layout-compact .gallery-thumbnail {
+        padding-bottom: 60%;
+    }
+    
+    /* 타일 레이아웃 */
+    .gallery-layout-tile.gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        column-count: unset;
+        padding: 0 0.5rem 3rem;
+    }
+    
+    /* 카드 레이아웃 */
+    .gallery-layout-card.gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        column-count: unset;
+        padding: 0 0.5rem 3rem;
+    }
+    
+    /* 테이블 레이아웃 */
+    .gallery-layout-table.gallery-grid {
+        display: table;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        column-count: unset;
+        padding: 0 0.5rem 3rem;
+    }
+    
+    .gallery-layout-table .gallery-item {
+        display: table-row;
+        margin-bottom: 0;
+    }
+    
+    .gallery-layout-table .gallery-card {
+        display: table-cell;
+        vertical-align: middle;
+        padding: 1rem;
+        border-bottom: 1px solid #e8eaed;
+    }
+    
+    /* 갤러리 레이아웃 (원본 Masonry와 동일) */
+    .gallery-layout-gallery.gallery-grid {
+        display: block;
+        column-count: 4;
+        column-gap: 1.5rem;
+        padding: 0 0.5rem 3rem;
     }
     
     /* 갤러리 아이템 */
@@ -75,9 +238,7 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
         border: 1px solid rgba(0, 0, 0, 0.04);
-        text-decoration: none;
         color: inherit;
-        cursor: pointer;
         display: block;
     }
     
@@ -104,36 +265,165 @@
         padding: 1.25rem;
     }
     
-    .gallery-card-title {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #1a202c;
-        margin: 0 0 0.75rem 0;
-        line-height: 1.4;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+    /* 피드백 버튼 스타일 */
+    .feedback-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 24px;
+        background: #f7fafc;
+        color: #718096;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
     
-    .gallery-card-meta {
+    .feedback-btn:hover {
+        background: #edf2f7;
+        transform: translateY(-1px);
+    }
+    
+    .feedback-btn i {
+        font-size: 1rem;
+    }
+    
+    .feedback-like-btn:hover {
+        background: #fed7d7;
+        color: #e53e3e;
+    }
+    
+    
+    /* 댓글 영역 스타일 */
+    .comments-container {
+        background: #f7fafc;
+        border-radius: 12px;
+        padding: 0.875rem;
+        margin-top: 0.75rem;
+    }
+    
+    .comments-list {
+        max-height: 250px;
+        overflow-y: auto;
+        margin-bottom: 0.75rem;
+    }
+    
+    .comment-item {
+        background: white;
+        border-radius: 8px;
+        padding: 0.625rem;
+        margin-bottom: 0.625rem;
+        border-left: 3px solid #667eea;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        color: #a0aec0;
-        font-size: 0.8125rem;
-        flex-wrap: wrap;
-        margin-top: 0.5rem;
+        gap: 0.5rem;
     }
     
-    .gallery-card-meta-item {
+    .comment-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .comment-author {
         display: flex;
         align-items: center;
         gap: 0.375rem;
+        flex-shrink: 0;
     }
     
-    .gallery-card-meta-item i {
+    .comment-author strong {
+        font-size: 0.75rem;
+        color: #2d3748;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .comment-time {
+        font-size: 0.65rem;
+        color: #a0aec0;
+        white-space: nowrap;
+    }
+    
+    .comment-content {
+        font-size: 0.75rem;
+        color: #4a5568;
+        margin: 0;
+        line-height: 1.4;
+        flex: 1;
+        word-break: break-word;
+    }
+    
+    .comment-empty {
+        text-align: center;
+        color: #a0aec0;
+        font-size: 0.75rem;
+        padding: 0.75rem 0;
+        margin: 0;
+    }
+    
+    .comment-input-group {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .comment-input {
+        flex: 1;
+        padding: 0.5rem 0.875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        font-size: 0.75rem;
+        background: white;
+        transition: all 0.2s ease;
+    }
+    
+    .comment-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .comment-submit-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+    
+    .comment-submit-btn:hover {
+        background: #5568d3;
+        transform: scale(1.05);
+    }
+    
+    .comment-submit-btn i {
         font-size: 0.875rem;
+    }
+    
+    .comment-login-prompt {
+        text-align: center;
+        color: #a0aec0;
+        font-size: 0.75rem;
+        padding: 0.75rem 0;
+        margin: 0;
+    }
+    
+    .comment-login-prompt a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .comment-login-prompt a:hover {
+        text-decoration: underline;
     }
     
     .gallery-empty {
@@ -155,60 +445,452 @@
         padding: 0 !important;
         padding-top: 70px !important; /* 네비게이션 바 높이만 */
     }
+    
+    /* 배경 테마 스타일 */
+    body.theme-default {
+        background: #f8f9fa;
+    }
+    
+    body.theme-dark {
+        background: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    body.theme-dark .gallery-card {
+        background: #2d2d2d;
+        color: #ffffff;
+    }
+    
+    body.theme-dark .gallery-card-title {
+        color: #ffffff;
+    }
+    
+    body.theme-dark .gallery-card-meta-item {
+        color: #b0b0b0;
+    }
+    
+    body.theme-light {
+        background: #ffffff;
+    }
+    
+    body.theme-colorful {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        background-attachment: fixed;
+    }
+    
+    body.theme-minimal {
+        background: #fafafa;
+    }
+    
+    body.theme-creamy {
+        background: #fffef7;
+    }
+    
+    body.theme-blue {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        background-attachment: fixed;
+    }
+    
+    body.theme-green {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        background-attachment: fixed;
+    }
+    
+    body.theme-colorful .gallery-sidebar,
+    body.theme-blue .gallery-sidebar,
+    body.theme-green .gallery-sidebar {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
+{% csrf_token %}
 <div class="container-fluid px-0">
     <div class="gallery-header px-3">
-        <h1>갤러리</h1>
-        <p>다른 사용자의 보드를 구경하세요</p>
+        <h1>인라인 피드백 허브</h1>
+        <p>포스트에 좋아요와 댓글을 남겨보세요</p>
     </div>
 
-    {% if boards %}
-    <div class="gallery-grid">
-        {% for board in boards %}
-            {% with thumbnail_url=board.get_thumbnail_url gradient_colors=board.get_gradient_colors %}
+    <div class="row gx-0 px-2">
+        <!-- 사이드바 -->
+        <div class="col-12 col-md-3 col-lg-2 mb-3">
+            <div class="gallery-sidebar">
+                <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center mb-3 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-expanded="false" aria-controls="sidebarMenu" style="font-weight: 500; color: #2d3748; border-color: #d0d0d0;">
+                    <span><i class="bi bi-sliders me-2"></i>필터</span>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <div class="collapse d-md-block" id="sidebarMenu">
+                    <label class="form-label d-flex align-items-center mb-2">
+                        <i class="bi bi-layout-three-columns me-2"></i>카드 배치
+                    </label>
+                    <select id="layoutSelect" class="form-select form-select-sm mb-3">
+                        <option value="masonry" selected>Masonry</option>
+                        <option value="grid">그리드</option>
+                        <option value="list">리스트</option>
+                        <option value="compact">컴팩트</option>
+                        <option value="tile">타일</option>
+                        <option value="card">카드</option>
+                        <option value="table">테이블</option>
+                        <option value="gallery">갤러리</option>
+                    </select>
+                    
+                    <label class="form-label d-flex align-items-center mb-2">
+                        <i class="bi bi-palette me-2"></i>배경 테마
+                    </label>
+                    <select id="themeSelect" class="form-select form-select-sm">
+                        <option value="default" selected>기본</option>
+                        <option value="dark">다크</option>
+                        <option value="light">라이트</option>
+                        <option value="colorful">컬러풀</option>
+                        <option value="minimal">미니멀</option>
+                        <option value="creamy">크리미</option>
+                        <option value="blue">블루</option>
+                        <option value="green">그린</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 갤러리 영역 -->
+        <div class="col-12 col-md-9 col-lg-10 ps-md-4">
+    {% if posts %}
+    <div class="gallery-grid gallery-layout-masonry" id="galleryContainer">
+        {% for post in posts %}
             <div class="gallery-item">
-                <a href="{% url 'collaboration:board_public' board.id %}" class="gallery-card">
+                <div class="gallery-card">
                     <!-- 썸네일 이미지 또는 파스텔톤 그라디언트 -->
                     <div class="gallery-thumbnail" 
-                         {% if thumbnail_url %}
-                         style="background-image: url('{{ thumbnail_url }}');"
+                         {% if post.image %}
+                         style="background-image: url('{{ post.image.url }}');"
                          {% else %}
-                         style="background: linear-gradient(135deg, {{ gradient_colors.0 }} 0%, {{ gradient_colors.1 }} 100%);"
+                         style="background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);"
                          {% endif %}>
                     </div>
                     
                     <!-- 카드 콘텐츠 -->
                     <div class="gallery-content">
-                        <h3 class="gallery-card-title">{{ board.title }}</h3>
-                        <div class="gallery-card-meta">
-                            <span class="gallery-card-meta-item">
-                                <i class="bi bi-person-circle"></i>
-                                <span>{{ board.creator.username }}</span>
-                            </span>
-                            <span class="gallery-card-meta-item">
-                                <i class="bi bi-calendar3"></i>
-                                <span>{{ board.created_at|date:"Y-m-d" }}</span>
-                            </span>
-                            <span class="gallery-card-meta-item">
-                                <i class="bi bi-sticky"></i>
-                                <span>{{ board.posts.count }}개</span>
-                            </span>
+                        {% if post.content %}
+                            {# 메타데이터만 있는 경우 표시하지 않음 #}
+                            {% if post.content|slice:":1" == "{" and "metadata" in post.content %}
+                            {% else %}
+                                <p class="gallery-card-text" style="color: #4a5568; font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.5;">{{ post.content|truncatewords:30 }}</p>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <!-- 피드백 영역 -->
+                        <div class="gallery-feedback">
+                            <!-- 좋아요 버튼 -->
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <button class="feedback-btn feedback-like-btn" data-post-id="{{ post.id }}" data-type="like" title="좋아요">
+                                    <i class="bi bi-heart"></i>
+                                    <span class="likes-count">{{ post.likes }}</span>
+                                </button>
+                            </div>
+                            
+                            <!-- 댓글 영역 (항상 표시) -->
+                            <div class="comments-container">
+                                <!-- 댓글 목록 -->
+                                <div class="comments-list mb-3" data-post-id="{{ post.id }}">
+                                    {% for comment in post.comments.all %}
+                                    <div class="comment-item">
+                                        <div class="comment-author">
+                                            <strong>{{ comment.author.username }}</strong>
+                                            <small class="comment-time">{{ comment.created_at|date:"m-d H:i" }}</small>
+                                        </div>
+                                        <span class="comment-content">{{ comment.content }}</span>
+                                    </div>
+                                    {% empty %}
+                                    <p class="comment-empty">아직 댓글이 없습니다.</p>
+                                    {% endfor %}
+                                </div>
+                                
+                                <!-- 댓글 작성 폼 -->
+                                {% if user.is_authenticated %}
+                                <form class="comment-form" data-post-id="{{ post.id }}">
+                                    {% csrf_token %}
+                                    <div class="comment-input-group">
+                                        <input type="text" 
+                                               class="comment-input" 
+                                               name="content" 
+                                               placeholder="댓글을 입력하세요..." 
+                                               required>
+                                        <button class="comment-submit-btn" type="submit">
+                                            <i class="bi bi-send-fill"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                                {% else %}
+                                <p class="comment-login-prompt">
+                                    <a href="{% url 'accounts:login' %}">로그인</a> 후 댓글을 작성할 수 있습니다.
+                                </p>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </a>
+                </div>
             </div>
-            {% endwith %}
         {% endfor %}
     </div>
     {% else %}
     <div class="gallery-empty">
         <i class="bi bi-inbox"></i>
-        <h4 class="mt-3 mb-2">등록된 보드가 없습니다</h4>
-        <p class="text-muted">첫 번째 보드를 만들어보세요!</p>
+        <h4 class="mt-3 mb-2">등록된 포스트가 없습니다</h4>
+        <p class="text-muted">첫 번째 포스트를 만들어보세요!</p>
     </div>
     {% endif %}
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 카드 배치 방식 변경 함수
+    function changeGalleryLayout(layout) {
+        const container = document.getElementById('galleryContainer');
+        if (!container) return;
+        
+        // 기존 레이아웃 클래스 제거
+        const layouts = ['grid', 'list', 'masonry', 'compact', 'tile', 'card', 'table', 'gallery'];
+        layouts.forEach(l => {
+            container.classList.remove(`gallery-layout-${l}`);
+        });
+        
+        // 새 레이아웃 클래스 추가
+        container.classList.add(`gallery-layout-${layout}`);
+        
+        // 로컬 스토리지에 저장
+        localStorage.setItem('galleryLayout', layout);
+    }
+    
+    // 배경 테마 변경 함수
+    function changeGalleryTheme(theme) {
+        const body = document.body;
+        if (!body) return;
+        
+        // 기존 테마 클래스 제거
+        const themes = ['default', 'dark', 'light', 'colorful', 'minimal', 'creamy', 'blue', 'green'];
+        themes.forEach(t => {
+            body.classList.remove(`theme-${t}`);
+        });
+        
+        // 새 테마 클래스 추가
+        body.classList.add(`theme-${theme}`);
+        
+        // 로컬 스토리지에 저장
+        localStorage.setItem('galleryTheme', theme);
+    }
+    
+    // 저장된 배치 방식 불러오기
+    function loadGalleryLayout() {
+        const savedLayout = localStorage.getItem('galleryLayout') || 'masonry';
+        const select = document.getElementById('layoutSelect');
+        if (select) {
+            select.value = savedLayout;
+            changeGalleryLayout(savedLayout);
+        }
+    }
+    
+    // 저장된 테마 불러오기
+    function loadGalleryTheme() {
+        const savedTheme = localStorage.getItem('galleryTheme') || 'default';
+        const select = document.getElementById('themeSelect');
+        if (select) {
+            select.value = savedTheme;
+            changeGalleryTheme(savedTheme);
+        }
+    }
+    
+    // 좋아요를 누른 포스트 ID를 저장 (중복 클릭 방지)
+    const likedPosts = new Set();
+    
+    // 피드백 버튼 클릭 이벤트
+    function setupFeedbackButtons() {
+        document.querySelectorAll('.feedback-btn[data-type]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const postId = this.getAttribute('data-post-id');
+                const feedbackType = this.getAttribute('data-type');
+                
+                // postId와 feedbackType 유효성 검사
+                if (!postId || postId === 'null' || !feedbackType) {
+                    console.error('Invalid postId or feedbackType:', postId, feedbackType);
+                    return;
+                }
+                
+                // 중복 클릭 방지 (이미 좋아요를 누른 포스트인지 확인)
+                if (likedPosts.has(postId)) {
+                    alert('이미 좋아요를 누르셨습니다.');
+                    return;
+                }
+                
+                // 버튼 비활성화 (중복 클릭 방지)
+                this.disabled = true;
+                this.style.opacity = '0.6';
+                this.style.cursor = 'not-allowed';
+                
+                // CSRF 토큰 가져오기
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (!csrfToken) {
+                    alert('CSRF 토큰을 찾을 수 없습니다.');
+                    this.disabled = false;
+                    this.style.opacity = '1';
+                    this.style.cursor = 'pointer';
+                    return;
+                }
+                
+                // AJAX 요청
+                fetch(`/collaboration/post/${postId}/feedback/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken.value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: `type=${feedbackType}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 좋아요 카운트 업데이트
+                        const likesCount = document.querySelector(`.feedback-like-btn[data-post-id="${postId}"] .likes-count`);
+                        if (likesCount) {
+                            likesCount.textContent = data.likes;
+                        }
+                        
+                        // 좋아요를 누른 포스트로 표시
+                        likedPosts.add(postId);
+                        
+                        // 버튼 스타일 변경 (좋아요 누른 상태)
+                        const likeBtn = document.querySelector(`.feedback-like-btn[data-post-id="${postId}"]`);
+                        if (likeBtn) {
+                            likeBtn.style.background = '#fed7d7';
+                            likeBtn.style.color = '#e53e3e';
+                        }
+                    } else {
+                        // 실패 시 버튼 다시 활성화
+                        this.disabled = false;
+                        this.style.opacity = '1';
+                        this.style.cursor = 'pointer';
+                        
+                        if (data.login_url) {
+                            window.location.href = data.login_url;
+                        } else {
+                            alert(data.message || '오류가 발생했습니다.');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 에러 시 버튼 다시 활성화
+                    this.disabled = false;
+                    this.style.opacity = '1';
+                    this.style.cursor = 'pointer';
+                    alert('오류가 발생했습니다.');
+                });
+            });
+        });
+    }
+    
+    // 댓글 작성 폼 제출 이벤트
+    function setupCommentForms() {
+        document.querySelectorAll('.comment-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const postId = this.getAttribute('data-post-id');
+                const content = this.querySelector('input[name="content"]').value.trim();
+                const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                if (!content) {
+                    alert('댓글 내용을 입력해주세요.');
+                    return;
+                }
+                
+                // AJAX 요청
+                fetch(`/collaboration/post/${postId}/comment/create/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: `content=${encodeURIComponent(content)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 댓글 목록에 새 댓글 추가
+                        const commentsList = document.querySelector(`.comments-list[data-post-id="${postId}"]`);
+                        if (commentsList) {
+                            // "아직 댓글이 없습니다" 메시지 제거
+                            const emptyMsg = commentsList.querySelector('.comment-empty');
+                            if (emptyMsg) {
+                                emptyMsg.remove();
+                            }
+                            
+                            // 새 댓글 요소 생성
+                            const commentDiv = document.createElement('div');
+                            commentDiv.className = 'comment-item';
+                            commentDiv.innerHTML = `
+                                <div class="comment-author">
+                                    <strong>${data.comment.author}</strong>
+                                    <small class="comment-time">${data.comment.created_at}</small>
+                                </div>
+                                <span class="comment-content">${data.comment.content}</span>
+                            `;
+                            commentsList.insertBefore(commentDiv, commentsList.firstChild);
+                        }
+                        
+                        // 댓글 카운트는 제거되었으므로 업데이트 불필요
+                        
+                        // 폼 초기화
+                        this.querySelector('input[name="content"]').value = '';
+                    } else {
+                        if (data.login_url) {
+                            window.location.href = data.login_url;
+                        } else {
+                            alert(data.message || '오류가 발생했습니다.');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                });
+            });
+        });
+    }
+    
+    // 페이지 로드 시 실행
+    document.addEventListener('DOMContentLoaded', function() {
+        loadGalleryLayout();
+        loadGalleryTheme();
+        
+        // 배치 방식 드롭다운 변경 이벤트
+        const layoutSelect = document.getElementById('layoutSelect');
+        if (layoutSelect) {
+            layoutSelect.addEventListener('change', function(e) {
+                changeGalleryLayout(e.target.value);
+            });
+        }
+        
+        // 테마 드롭다운 변경 이벤트
+        const themeSelect = document.getElementById('themeSelect');
+        if (themeSelect) {
+            themeSelect.addEventListener('change', function(e) {
+                changeGalleryTheme(e.target.value);
+            });
+        }
+        
+        // 피드백 및 댓글 기능 초기화
+        setupFeedbackButtons();
+        setupCommentForms();
+    });
+</script>
 {% endblock %}
