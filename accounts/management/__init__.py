@@ -1,6 +1,0 @@
-# Management package
-
-
-
-
-
