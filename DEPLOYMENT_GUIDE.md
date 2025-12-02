@@ -150,3 +150,4 @@ Web 탭에서 **Reload** 버튼 클릭
 - **정적 파일 미표시:** `collectstatic` 실행 확인 및 Static files 경로 확인
 - **마이그레이션 오류:** `python manage.py migrate` 재실행
 
+
