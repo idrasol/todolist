@@ -229,10 +229,9 @@
             flex: 1 1 auto;
             min-width: 0;
             overflow-x: auto;
-            display: flex !important;
-            justify-content: flex-start;
-            margin: 0;
             -webkit-overflow-scrolling: touch;
+            margin: 0;
+            padding: 0;
         }
         
         .search-pagination-wrapper .pagination {
@@ -240,6 +239,7 @@
             margin: 0 !important;
             flex-wrap: nowrap !important;
             gap: 0;
+            display: flex;
         }
         
         .search-pagination-wrapper .page-link {
@@ -258,13 +258,6 @@
         .search-pagination-wrapper .page-item {
             white-space: nowrap;
             margin: 0;
-        }
-        
-        /* 페이지네이션 스크롤 가능하게 */
-        .search-pagination-wrapper nav {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            width: 100%;
         }
     }
     
@@ -647,9 +640,8 @@
         
         <!-- 페이지네이션 (오른쪽) -->
         {% if page_obj.has_other_pages %}
-        <div class="d-flex justify-content-start flex-grow-1 search-pagination-nav" style="min-width: 0; overflow-x: auto;">
-            <nav aria-label="Page navigation" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
-                <ul class="pagination justify-content-start mb-0" style="flex-wrap: nowrap;">
+        <nav aria-label="Page navigation" class="search-pagination-nav">
+            <ul class="pagination justify-content-start mb-0" style="flex-wrap: nowrap;">
             {% if page_obj.has_previous %}
             <li class="page-item">
                 <a class="page-link" href="?page=1{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">처음</a>
@@ -680,8 +672,7 @@
             </li>
             {% endif %}
         </ul>
-            </nav>
-        </div>
+        </nav>
         {% endif %}
     </div>
     </div>
