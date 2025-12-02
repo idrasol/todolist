@@ -67,19 +67,28 @@
         padding: 0 0.5rem 3rem;
     }
     
-    /* 반응형 분기점 - 모바일에서도 데스크탑 레이아웃 유지 */
+    /* 반응형 분기점 - 태블릿 */
     @media (max-width: 1200px) {
         .gallery-layout-masonry.gallery-grid {
-            column-count: 4;
+            column-count: 3;
         }
     }
     
+    /* 반응형 분기점 - 태블릿 (768px 이하) */
     @media (max-width: 768px) {
-        /* 모바일에서도 데스크탑과 동일한 레이아웃 유지 */
         .gallery-layout-masonry.gallery-grid {
-            column-count: 4;
-            column-gap: 1.5rem;
-            padding: 0 0.5rem 3rem;
+            column-count: 2;
+            column-gap: 1rem;
+            padding: 0 0.5rem 2rem;
+        }
+        
+        /* 갤러리 헤더 폰트 사이즈 조정 */
+        .gallery-header h1 {
+            font-size: 2rem;
+        }
+        
+        .gallery-header p {
+            font-size: 1rem;
         }
         
         /* 모바일에서도 가로 레이아웃 유지 */
@@ -97,24 +106,30 @@
             margin-bottom: 1rem;
             min-width: auto;
         }
+    }
+    
+    /* 반응형 분기점 - 모바일 (576px 이하) */
+    @media (max-width: 576px) {
+        .gallery-layout-masonry.gallery-grid {
+            column-count: 1;
+            column-gap: 1rem;
+            padding: 0 0.5rem 2rem;
+        }
+        
+        /* 갤러리 헤더 폰트 사이즈 더 작게 */
+        .gallery-header h1 {
+            font-size: 1.75rem;
+        }
+        
+        .gallery-header p {
+            font-size: 0.95rem;
+        }
         
         .col-12.col-md-9.col-lg-10 {
             min-width: auto;
         }
     }
     
-    @media (max-width: 576px) {
-        /* 작은 화면에서도 데스크탑 레이아웃 유지 */
-        .gallery-layout-masonry.gallery-grid {
-            column-count: 4;
-            column-gap: 1.5rem;
-            padding: 0 0.5rem 3rem;
-        }
-        
-        .gallery-sidebar {
-            min-width: auto;
-        }
-    }
     
     /* 그리드 레이아웃 */
     .gallery-layout-grid.gallery-grid {
@@ -509,7 +524,7 @@
 {% csrf_token %}
 <div class="container-fluid px-0">
     <div class="gallery-header px-3">
-        <h1>인라인 피드백 허브</h1>
+        <h1>갤러리</h1>
         <p>포스트에 좋아요와 댓글을 남겨보세요</p>
     </div>
 

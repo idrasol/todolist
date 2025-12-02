@@ -357,3 +357,40 @@ body {
     display: block;
     object-fit: contain;
 }
+
+/* 모바일 최적화 (768px 이하) */
+@media (max-width: 768px) {
+    /* 메인 컨테이너 패딩 축소 */
+    .gemini-main {
+        padding: 1rem 0.5rem;
+        padding-top: 4rem;
+    }
+    
+    /* 캔버스 내부 패딩 축소 및 터치 최적화 */
+    .gemini-canvas {
+        padding: 1rem;
+        touch-action: none; /* 드래그 반응성 향상 */
+    }
+    
+    /* 포스트잇 크기 조정 */
+    .gemini-post-it {
+        min-width: 150px;
+        max-width: 200px;
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    /* 터치 타겟 최소 크기 설정 */
+    .btn,
+    .nav-link {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* 버튼 패딩 조정 */
+    .btn {
+        padding: 0.625rem 1rem;
+    }
+}
