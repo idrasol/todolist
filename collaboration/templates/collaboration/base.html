@@ -33,6 +33,16 @@
             .navbar-nav .nav-item:last-child {
                 margin-bottom: 0;
             }
+            
+            /* 모바일에서 메인 네비게이션 메뉴 스타일 */
+            .navbar-nav.d-flex.flex-row .nav-item {
+                margin-bottom: 0;
+            }
+            
+            .navbar-nav.d-flex.flex-row .nav-link {
+                font-size: 0.85rem !important;
+                padding: 0.5rem 0.5rem !important;
+            }
         }
         
         /* container-fluid 수평 패딩 최소화 - 와이드 레이아웃 */
@@ -70,32 +80,34 @@
             <a class="navbar-brand text-dark" href="/" style="font-weight: 600;">
                 Moa
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <!-- 메인 네비게이션 메뉴 (모바일에서도 항상 표시) -->
+            <ul class="navbar-nav me-auto align-items-center d-flex flex-row">
+                <li class="nav-item d-flex align-items-center">
+                    <a class="nav-link text-dark fw-bold" href="/" style="font-size: 0.9rem; padding: 0.5rem 0.75rem;">
+                        홈
+                    </a>
+                </li>
+                <li class="nav-item d-flex align-items-center">
+                    <a class="nav-link text-dark fw-bold" href="{% url 'collaboration:board_list' %}" style="font-size: 0.9rem; padding: 0.5rem 0.75rem;">
+                        보드
+                    </a>
+                </li>
+                <li class="nav-item d-flex align-items-center">
+                    <a class="nav-link text-dark fw-bold" href="{% url 'collaboration:gallery' %}" style="font-size: 0.9rem; padding: 0.5rem 0.75rem;">
+                        갤러리
+                    </a>
+                </li>
+                <li class="nav-item d-flex align-items-center">
+                    <a class="nav-link text-dark fw-bold" href="{% url 'forum:post_list' %}" style="font-size: 0.9rem; padding: 0.5rem 0.75rem;">
+                        게시판
+                    </a>
+                </li>
+            </ul>
+            <!-- 사용자 관련 메뉴 (햄버거 버튼으로 접을 수 있음) -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarUserMenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto align-items-center">
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="nav-link text-dark fw-bold" href="/" style="font-size: 0.95rem;">
-                            홈
-                        </a>
-                    </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="nav-link text-dark fw-bold" href="{% url 'collaboration:board_list' %}" style="font-size: 0.95rem;">
-                            보드
-                        </a>
-                    </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="nav-link text-dark fw-bold" href="{% url 'collaboration:gallery' %}" style="font-size: 0.95rem;">
-                            갤러리
-                        </a>
-                    </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="nav-link text-dark fw-bold" href="{% url 'forum:post_list' %}" style="font-size: 0.95rem;">
-                            게시판
-                        </a>
-                    </li>
-                </ul>
+            <div class="collapse navbar-collapse" id="navbarUserMenu">
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if user.is_authenticated %}
                         {% if user.username|slice:":6" == "Guest_" %}
