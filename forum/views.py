@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from .models import Post, Comment
 from .forms import PostForm, CommentForm
 
@@ -10,7 +12,12 @@ from .forms import PostForm, CommentForm
 def post_list(request):
     """게시글 목록"""
     search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
     posts = Post.objects.all()
+    
+    # 카테고리 필터링
+    if category_filter:
+        posts = posts.filter(category=category_filter)
     
     # 검색 기능
     if search_query:
@@ -21,13 +28,15 @@ def post_list(request):
         )
     
     # 페이지네이션
-    paginator = Paginator(posts, 10)  # 페이지당 10개
+    paginator = Paginator(posts, 5)  # 페이지당 5개
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
+        'category_filter': category_filter,
+        'category_choices': Post.CATEGORY_CHOICES,
     }
     return render(request, 'forum/post_list.html', context)
 
@@ -42,6 +51,11 @@ def post_detail(request, pk):
     
     # 댓글 목록
     comments = post.comments.all()
+    
+    # 좋아요 여부 확인
+    is_liked = False
+    if request.user.is_authenticated:
+        is_liked = post.likes.filter(pk=request.user.pk).exists()
     
     # 댓글 작성
     if request.method == 'POST' and request.user.is_authenticated:
@@ -60,6 +74,7 @@ def post_detail(request, pk):
         'post': post,
         'comments': comments,
         'comment_form': comment_form,
+        'is_liked': is_liked,
     }
     return render(request, 'forum/post_detail.html', context)
 
@@ -152,3 +167,25 @@ def comment_delete(request, pk):
     comment.delete()
     messages.success(request, '댓글이 삭제되었습니다.')
     return redirect('forum:post_detail', pk=post_pk)
+
+
+@login_required
+@require_POST
+def post_like(request, pk):
+    """게시글 좋아요/좋아요 취소"""
+    post = get_object_or_404(Post, pk=pk)
+    
+    if post.likes.filter(pk=request.user.pk).exists():
+        # 이미 좋아요를 눌렀으면 취소
+        post.likes.remove(request.user)
+        is_liked = False
+    else:
+        # 좋아요 추가
+        post.likes.add(request.user)
+        is_liked = True
+    
+    return JsonResponse({
+        'success': True,
+        'is_liked': is_liked,
+        'total_likes': post.total_likes()
+    })

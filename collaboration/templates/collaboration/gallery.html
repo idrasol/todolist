@@ -33,7 +33,7 @@
         display: block;
         column-count: 4;
         column-gap: 1.5rem;
-        padding: 0 1rem 3rem;
+        padding: 0 0.5rem 3rem;
     }
     
     /* 반응형 분기점 */
@@ -44,6 +44,12 @@
     }
     
     @media (max-width: 768px) {
+        .gallery-grid {
+            column-count: 1;
+        }
+    }
+    
+    @media (max-width: 576px) {
         .gallery-grid {
             column-count: 1;
         }
@@ -137,12 +143,20 @@
         color: #cbd5e0;
         margin-bottom: 1rem;
     }
+    
+    /* 메인 화면 전체 너비 사용 */
+    .gemini-main {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        padding-top: 70px !important; /* 네비게이션 바 높이만 */
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid px-0">
-    <div class="gallery-header">
+    <div class="gallery-header px-3">
         <h1>갤러리</h1>
         <p>다른 사용자의 보드를 구경하세요</p>
     </div>

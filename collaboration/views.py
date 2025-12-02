@@ -219,18 +219,66 @@ def post_update(request, post_id):
     if request.method == 'POST':
         # AJAX 요청인 경우
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # 이미지 업로드 (파일 업로드는 먼저 체크)
+            if 'image' in request.FILES:
+                try:
+                    post.image = request.FILES['image']
+                    post.save(update_fields=['image'])  # 명시적으로 image 필드만 업데이트
+                    
+                    # 이미지 URL이 제대로 생성되는지 확인
+                    image_url = post.image.url if post.image else None
+                    if not image_url:
+                        return JsonResponse({
+                            'success': False,
+                            'message': '이미지 URL을 생성할 수 없습니다.'
+                        }, status=400)
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'image_url': image_url
+                    })
+                except Exception as e:
+                    import traceback
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'이미지 업로드 실패: {str(e)}',
+                        'error_detail': traceback.format_exc() if settings.DEBUG else None
+                    }, status=400)
+            
+            # 파일 업로드
+            if 'attached_file' in request.FILES:
+                try:
+                    post.attached_file = request.FILES['attached_file']
+                    post.save()
+                    return JsonResponse({
+                        'success': True,
+                        'file_url': post.attached_file.url if post.attached_file else None,
+                        'file_name': post.attached_file.name.split('/')[-1] if post.attached_file else None
+                    })
+                except Exception as e:
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'파일 업로드 실패: {str(e)}'
+                    }, status=400)
+            
             # 위치 업데이트
             if 'position_x' in request.POST and 'position_y' in request.POST:
-                position_x = float(request.POST.get('position_x', post.position_x))
-                position_y = float(request.POST.get('position_y', post.position_y))
-                
-                post.position_x = position_x
-                post.position_y = position_y
-                post.save()
-                
-                return JsonResponse({
-                    'success': True
-                })
+                try:
+                    position_x = float(request.POST.get('position_x', post.position_x))
+                    position_y = float(request.POST.get('position_y', post.position_y))
+                    
+                    post.position_x = position_x
+                    post.position_y = position_y
+                    post.save()
+                    
+                    return JsonResponse({
+                        'success': True
+                    })
+                except (ValueError, TypeError) as e:
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'위치 업데이트 실패: {str(e)}'
+                    }, status=400)
             
             # z_index 업데이트
             if 'z_index' in request.POST:
@@ -241,27 +289,11 @@ def post_update(request, post_id):
                     return JsonResponse({
                         'success': True
                     })
-                except (ValueError, TypeError):
-                    pass
-            
-            # 이미지 업로드
-            if 'image' in request.FILES:
-                post.image = request.FILES['image']
-                post.save()
-                return JsonResponse({
-                    'success': True,
-                    'image_url': post.image.url if post.image else None
-                })
-            
-            # 파일 업로드
-            if 'attached_file' in request.FILES:
-                post.attached_file = request.FILES['attached_file']
-                post.save()
-                return JsonResponse({
-                    'success': True,
-                    'file_url': post.attached_file.url if post.attached_file else None,
-                    'file_name': post.attached_file.name.split('/')[-1] if post.attached_file else None
-                })
+                except (ValueError, TypeError) as e:
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'z_index 업데이트 실패: {str(e)}'
+                    }, status=400)
             
             # 내용 수정
             if 'content' in request.POST:

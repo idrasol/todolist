@@ -34,6 +34,33 @@
                 margin-bottom: 0;
             }
         }
+        
+        /* container-fluid 수평 패딩 최소화 - 와이드 레이아웃 */
+        .container-fluid {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+        
+        @media (min-width: 576px) {
+            .container-fluid {
+                padding-right: 0.5rem !important;
+                padding-left: 0.5rem !important;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .container-fluid {
+                padding-right: 0.75rem !important;
+                padding-left: 0.75rem !important;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            .container-fluid {
+                padding-right: 1rem !important;
+                padding-left: 1rem !important;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>

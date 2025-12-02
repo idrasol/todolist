@@ -64,6 +64,135 @@
         background-size: 20px 20px;
         background-position: 0 0, 10px 10px;
         border-radius: 12px;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+    
+    /* 캔버스 테마 스타일 */
+    /* 기본 테마 (기존 스타일) */
+    .canvas-theme-default {
+        background: 
+            radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-color: #f8f9fa;
+        border-color: #e0e0e0;
+    }
+    
+    /* 다크 모드 */
+    .canvas-theme-dark {
+        background: 
+            radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-color: #1a1a1a;
+        border-color: #333333;
+    }
+    
+    /* 그리드 라인 */
+    .canvas-theme-grid {
+        background-image: 
+            linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-color: #ffffff;
+        border-color: #d0d0d0;
+    }
+    
+    /* 점선 그리드 */
+    .canvas-theme-dotted {
+        background-image: 
+            radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-color: #fafafa;
+        border-color: #e0e0e0;
+    }
+    
+    /* 미니멀 */
+    .canvas-theme-minimal {
+        background: #ffffff;
+        background-image: none;
+        border-color: #e8eaed;
+    }
+    
+    /* 크리미 */
+    .canvas-theme-creamy {
+        background: 
+            radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-color: #fffef7;
+        border-color: #e8e5d3;
+    }
+    
+    /* 블루 스카이 */
+    .canvas-theme-blue-sky {
+        background: 
+            radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-color: #e3f2fd;
+        border-color: #bbdefb;
+    }
+    
+    /* 해상도 모드일 때 min-height 제거 */
+    .canvas-size-640x480,
+    .canvas-size-800x480,
+    .canvas-size-1280x720,
+    .canvas-size-1920x1080 {
+        min-height: 0 !important;
+    }
+    
+    /* 캔버스 해상도 조절 클래스 */
+    .canvas-size-640x480 {
+        width: 640px !important;
+        height: 480px !important;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    
+    .canvas-size-800x480 {
+        width: 800px !important;
+        height: 480px !important;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    
+    .canvas-size-1280x720 {
+        width: 1280px !important;
+        height: 720px !important;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    
+    .canvas-size-1920x1080 {
+        width: 1920px !important;
+        height: 1080px !important;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    
+    /* 캔버스 카드 패딩 제거 */
+    .gemini-card.p-0 {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* 캔버스 카드 크기 조절 */
+    .gemini-card.canvas-size-640x480,
+    .gemini-card.canvas-size-800x480,
+    .gemini-card.canvas-size-1280x720,
+    .gemini-card.canvas-size-1920x1080 {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    
+    /* 와이드 화면에서 캔버스 최대 활용 */
+    @media (min-width: 768px) {
+        .gemini-canvas {
+            padding: 0.5rem;
+        }
     }
     
     /* 모바일에서 캔버스 높이 조정 */
@@ -73,33 +202,48 @@
         }
     }
     
+    /* 메인 화면 전체 너비 사용 */
+    .gemini-main {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        padding-top: 70px !important; /* 네비게이션 바 높이만 */
+    }
+    
     /* 사이드바 스타일 개선 */
     .sidebar {
-        background: rgba(30, 30, 30, 0.95);
-        border-radius: 12px;
-        padding: 15px;
-        color: white;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 16px;
+        padding: 20px;
+        color: #2d3748;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e8eaed;
     }
     
     /* 모바일에서 사이드바 바텀 시트 스타일 */
     @media (max-width: 768px) {
-        .sidebar-mobile {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+        .sidebar {
+            position: relative !important; /* 모바일에서는 일반 배치 */
+            top: auto !important;
             width: 100%;
-            border-radius: 20px 20px 0 0;
-            max-height: 50vh;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-            padding: 20px;
+            border-radius: 12px;
+            margin-top: 1rem;
         }
         
-        /* 모바일에서 사이드바가 고정되므로 본문에 여백 추가 */
+        .sidebar-mobile {
+            position: relative;
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+        
+        /* 모바일에서 캔버스와 사이드바 간격 */
         .order-1 {
-            margin-bottom: 60vh;
+            margin-bottom: 1rem;
+        }
+        
+        .order-2 {
+            margin-top: 1rem;
         }
         
         /* 모바일에서 색상 팔레트 가로 스크롤 방지 */
@@ -126,12 +270,14 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        color: #2d3748;
     }
     
     .sidebar-logo .logo-icon {
         width: 28px;
         height: 28px;
-        background: white;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
         border-radius: 6px;
         display: flex;
         align-items: center;
@@ -144,28 +290,79 @@
     .sidebar-section-title {
         font-size: 14px;
         font-weight: 500;
-        color: rgba(255, 255, 255, 0.7);
+        color: #2d3748;
         margin-bottom: 15px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+    }
+    
+    /* 드롭다운 버튼 스타일 */
+    .sidebar .btn[data-bs-toggle="collapse"] {
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+        background: white;
+        border: 2px solid #e8eaed;
+        border-radius: 12px;
+        font-weight: 600;
+        color: #2d3748;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+    
+    .sidebar .btn[data-bs-toggle="collapse"]:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .sidebar .btn[data-bs-toggle="collapse"]:focus {
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        outline: none;
+    }
+    
+    .sidebar .btn[data-bs-toggle="collapse"][aria-expanded="true"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+    }
+    
+    /* 드롭다운 아이콘 회전 */
+    .sidebar .btn[data-bs-toggle="collapse"] .bi-chevron-down {
+        transition: transform 0.3s ease;
+        font-size: 0.85rem;
+    }
+    
+    .sidebar .btn[data-bs-toggle="collapse"][aria-expanded="true"] .bi-chevron-down {
+        transform: rotate(180deg);
+    }
+    
+    /* 드롭다운 콘텐츠 스타일 */
+    .sidebar .collapse {
+        margin-top: 0.75rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 12px;
+        border: 1px solid #e8eaed;
     }
     
     /* 색상 팔레트 스타일 - 확대된 디자인 */
     .color-palette {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 0.4rem;
-        margin-bottom: 20px;
+        gap: 0.75rem;
+        margin-bottom: 0;
     }
     
     .color-item,
     .draggable-source {
         width: 100%;
-        max-width: 60px;
-        height: 60px;
-        border-radius: 8px;
+        max-width: 70px;
+        height: 70px;
+        border-radius: 12px;
         cursor: grab;
-        transition: all 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         /* 드래그 필수 속성 */
         touch-action: none !important;
         user-select: none !important;
@@ -175,8 +372,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        border: 2px solid rgba(255, 255, 255, 0.8);
         user-select: none !important;
         -webkit-user-select: none !important;
         -moz-user-select: none !important;
@@ -224,9 +421,9 @@
     }
     
     .color-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 255, 255, 1);
     }
     
     .color-item:active {
@@ -298,6 +495,14 @@
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: move;
         border: 1px solid rgba(0, 0, 0, 0.1);
+        /* 터치 드래그 필수 속성 */
+        touch-action: none !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        -webkit-touch-callout: none !important;
+        -webkit-tap-highlight-color: transparent !important;
     }
     
     /* 드래그 중인 포스트잇은 transition 제거 */
@@ -392,6 +597,9 @@
         justify-content: center;
         width: 28px;
         height: 28px;
+        min-width: 44px; /* 터치 타겟 최소 크기 */
+        min-height: 44px;
+        padding: 0.5rem;
         background: rgba(0, 0, 0, 0.1);
         border-radius: 4px;
         cursor: pointer;
@@ -441,6 +649,9 @@
         justify-content: center;
         width: 28px;
         height: 28px;
+        min-width: 44px; /* 터치 타겟 최소 크기 */
+        min-height: 44px;
+        padding: 0.5rem;
         background: rgba(0, 0, 0, 0.1);
         border-radius: 4px;
         cursor: pointer;
@@ -453,6 +664,38 @@
         background: rgba(0, 0, 0, 0.2);
         color: #333;
     }
+    
+    /* 모바일에서 포스트잇 크기 및 폰트 조정 */
+    @media (max-width: 768px) {
+        .gemini-post-it {
+            width: 200px;
+            min-height: 140px;
+            padding: 14px;
+            font-size: 0.95rem;
+        }
+        
+        .post-content {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .post-image-upload-btn,
+        .post-file-upload-btn {
+            width: 32px !important;
+            height: 32px !important;
+            padding: 0.5rem !important;
+            min-width: 44px !important;
+            min-height: 44px !important;
+        }
+        
+        .post-delete-btn {
+            width: 28px !important;
+            height: 28px !important;
+            padding: 0 !important;
+            min-width: 44px !important;
+            min-height: 44px !important;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -464,60 +707,83 @@
     </form>
 </div>
 
-<div class="gemini-header mb-4">
+<div class="container-fluid mt-3 px-0">
+    <div class="gemini-header mb-4 px-3">
     <h1>
         <i class="bi bi-kanban"></i> {{ board.title }}
     </h1>
-    <div class="d-flex gap-2">
-        <a href="{% url 'collaboration:board_public' board.id %}" class="btn btn-gemini-secondary">
-            <i class="bi bi-image"></i> 전시 모드로 보기
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'collaboration:board_public' board.id %}" class="btn btn-gemini-secondary">
+                <i class="bi bi-image"></i> 전시 모드로 보기
+            </a>
     <a href="{% url 'collaboration:board_list' %}" class="btn btn-gemini-secondary">
         <i class="bi bi-arrow-left"></i> 목록으로 돌아가기
     </a>
-    </div>
+        </div>
 </div>
 
-<div class="row">
+    <div class="row gx-0">
     <!-- 왼쪽 사이드바 (col-md-2) - 모바일에서는 하단에 배치 -->
-    <div class="col-12 col-md-2 mb-4 order-2 order-md-1">
+    <div class="col-12 col-md-2 mb-4 order-2 order-md-1 px-2">
         <div class="sidebar sidebar-mobile">
-            <!-- Moa 로고 -->
-            <div class="sidebar-logo">
-                <div class="logo-icon">M</div>
-                <span>Moa</span>
-            </div>
-            
-            <!-- 포스트잇 팔레트 선택 -->
+            <!-- 포스트잇 드롭다운 -->
             <div class="mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="paletteType" id="paletteType1" value="portfolio" checked>
-                    <label class="form-check-label text-white" for="paletteType1" style="font-size: 0.9rem;">
-                        포스트잇 팔레트
-                    </label>
+                <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#postitMenu" aria-expanded="false" aria-controls="postitMenu" style="font-weight: 500; color: #2d3748; border-color: #d0d0d0;">
+                    <span><i class="bi bi-file-earmark-text me-2"></i>포스트잇</span>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <div class="collapse mt-2" id="postitMenu">
+                    <div class="color-palette">
+                        {% for color_value, color_label in color_choices %}
+                            <div class="color-item color-{{ color_value }} draggable-source" data-color="{{ color_value }}">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <p class="small text-muted mt-3 mb-0" style="font-size: 0.8rem; line-height: 1.5; text-align: center; padding: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 8px;">
+                        <i class="bi bi-hand-index"></i> 색상을 드래그하여 캔버스에 놓으세요
+                    </p>
                 </div>
             </div>
             
-            <!-- 포스트잇 팔레트 -->
-            <div class="color-palette">
-                {% for color_value, color_label in color_choices %}
-                    <div class="color-item color-{{ color_value }} draggable-source" data-color="{{ color_value }}">
-                        <i class="bi bi-file-earmark-text"></i>
-                    </div>
-                {% endfor %}
+            <!-- 캔버스 드롭다운 -->
+            <div class="mb-3">
+                <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#canvasMenu" aria-expanded="false" aria-controls="canvasMenu" style="font-weight: 500; color: #2d3748; border-color: #d0d0d0;">
+                    <span><i class="bi bi-arrows-fullscreen me-2"></i>캔버스</span>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <div class="collapse mt-2" id="canvasMenu">
+                    <label class="form-label mb-2 d-flex align-items-center" style="font-size: 0.85rem; font-weight: 600; color: #2d3748;">
+                        <i class="bi bi-arrows-fullscreen me-2"></i>캔버스 크기
+                    </label>
+                    <select id="canvasSizeSelect" class="form-select form-select-sm mb-3" style="background: white; color: #2d3748; border: 2px solid #e8eaed; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                        <option value="640x480">640 x 480</option>
+                        <option value="800x480" selected>800 x 480</option>
+                        <option value="1280x720">1280 x 720</option>
+                        <option value="1920x1080">1920 x 1080</option>
+                    </select>
+                    
+                    <label class="form-label mb-2 d-flex align-items-center" style="font-size: 0.85rem; font-weight: 600; color: #2d3748;">
+                        <i class="bi bi-palette me-2"></i>캔버스 테마
+                    </label>
+                    <select id="canvasThemeSelect" class="form-select form-select-sm" style="background: white; color: #2d3748; border: 2px solid #e8eaed; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                        <option value="default" selected>기본</option>
+                        <option value="dark">다크 모드</option>
+                        <option value="grid">그리드 라인</option>
+                        <option value="dotted">점선 그리드</option>
+                        <option value="minimal">미니멀</option>
+                        <option value="creamy">크리미</option>
+                        <option value="blue-sky">블루 스카이</option>
+                    </select>
+                </div>
             </div>
-            
-            <!-- 안내 텍스트 -->
-            <p class="small text-white-50 mt-3 mb-0" style="font-size: 0.85rem; line-height: 1.4;">
-                색상을 드래그하여 캔버스에 놓으세요
-            </p>
         </div>
     </div>
     
     <!-- 오른쪽 캔버스 영역 (col-md-10) - 모바일에서는 상단에 배치 -->
-    <div class="col-12 col-md-10 order-1 order-md-2">
-        <div class="gemini-card">
-    <div class="gemini-canvas" id="canvas">
+    <div class="col-12 col-md-10 order-1 order-md-2 px-2">
+        <div class="gemini-card p-0">
+    <div class="gemini-canvas canvas-theme-default" id="canvas">
         {% if posts %}
             {% for post in posts %}
                         <div class="gemini-post-it post-{{ post.color }}" data-post-id="{{ post.id }}" style="left: {{ post.position_x|default:0 }}px; top: {{ post.position_y|default:0 }}px; z-index: {{ post.z_index|default:1 }};">
@@ -566,6 +832,7 @@
         {% endif %}
             </div>
         </div>
+    </div>
     </div>
 </div>
 
@@ -619,7 +886,93 @@
         return tokenElement.value;
     }
     
+    // 캔버스 크기 조절 함수
+    function adjustCanvasSize(size) {
+        const canvas = document.getElementById('canvas');
+        const canvasCard = canvas.closest('.gemini-card');
+        
+        if (!canvas) return;
+        
+        // 기존 크기 클래스 제거 (모든 가능한 해상도 클래스)
+        const allSizes = ['640x480', '800x480', '1280x720', '1920x1080', 'full', 'small', 'medium', 'large'];
+        allSizes.forEach(s => {
+            canvas.classList.remove(`canvas-size-${s}`);
+            if (canvasCard) {
+                canvasCard.classList.remove(`canvas-size-${s}`);
+            }
+        });
+        
+        // 새 크기 클래스 추가
+        canvas.classList.add(`canvas-size-${size}`);
+        if (canvasCard) {
+            canvasCard.classList.add(`canvas-size-${size}`);
+        }
+        
+        // 로컬 스토리지에 저장
+        localStorage.setItem('canvasSize', size);
+    }
+    
+    // 저장된 캔버스 크기 불러오기
+    function loadCanvasSize() {
+        const savedSize = localStorage.getItem('canvasSize') || '800x480';
+        const select = document.getElementById('canvasSizeSelect');
+        if (select) {
+            select.value = savedSize;
+            adjustCanvasSize(savedSize);
+        }
+    }
+    
+    // 캔버스 테마 변경 함수
+    function adjustCanvasTheme(theme) {
+        const canvas = document.getElementById('canvas');
+        if (!canvas) return;
+        
+        // 기존 테마 클래스 제거
+        const allThemes = ['default', 'dark', 'grid', 'dotted', 'minimal', 'creamy', 'blue-sky'];
+        allThemes.forEach(t => {
+            canvas.classList.remove(`canvas-theme-${t}`);
+        });
+        
+        // 새 테마 클래스 추가
+        canvas.classList.add(`canvas-theme-${theme}`);
+        
+        // 로컬 스토리지에 저장
+        localStorage.setItem('canvasTheme', theme);
+    }
+    
+    // 저장된 캔버스 테마 불러오기
+    function loadCanvasTheme() {
+        const savedTheme = localStorage.getItem('canvasTheme') || 'default';
+        const select = document.getElementById('canvasThemeSelect');
+        if (select) {
+            select.value = savedTheme;
+            adjustCanvasTheme(savedTheme);
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
+        // 저장된 캔버스 크기 불러오기
+        loadCanvasSize();
+        
+        // 저장된 캔버스 테마 불러오기
+        loadCanvasTheme();
+        
+        // 캔버스 크기 조절 이벤트 리스너
+        const canvasSizeSelect = document.getElementById('canvasSizeSelect');
+        if (canvasSizeSelect) {
+            canvasSizeSelect.addEventListener('change', function(e) {
+                adjustCanvasSize(e.target.value);
+            });
+        }
+        
+        // 캔버스 테마 변경 이벤트 리스너
+        const canvasThemeSelect = document.getElementById('canvasThemeSelect');
+        if (canvasThemeSelect) {
+            canvasThemeSelect.addEventListener('change', function(e) {
+                adjustCanvasTheme(e.target.value);
+            });
+        }
+        
         // interact.js가 로드되었는지 확인
         if (typeof interact === 'undefined') {
             console.error('interact.js가 로드되지 않았습니다.');
@@ -658,6 +1011,9 @@
         interact('.draggable-source').draggable({
             inertia: false,
             autoScroll: false,
+            // 터치 이벤트 지원 강화
+            allowFrom: null,
+            ignoreFrom: null,
             listeners: {
                 start(event) {
                     const target = event.target;
@@ -820,21 +1176,32 @@
                                 'X-CSRFToken': csrfToken
                             }
                         })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(data => {
+                                    throw new Error(data.message || '이미지 업로드에 실패했습니다.');
+                                });
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             if (data.success && data.image_url) {
-                                // 이미지 미리보기 추가
+                                // 이미지 미리보기 추가 (캐시 방지를 위해 타임스탬프 추가)
+                                const timestamp = new Date().getTime();
+                                const imageUrlWithTimestamp = data.image_url + (data.image_url.includes('?') ? '&' : '?') + 't=' + timestamp;
+                                
                                 let imageContainer = postElement.querySelector('.post-image-container');
                                 if (!imageContainer) {
                                     imageContainer = document.createElement('div');
                                     imageContainer.className = 'post-image-container mb-2';
                                     postElement.insertBefore(imageContainer, contentElement);
                                 }
-                                imageContainer.innerHTML = `<img src="${data.image_url}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">`;
+                                imageContainer.innerHTML = `<img src="${imageUrlWithTimestamp}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;" onerror="this.src='${data.image_url}';">`;
                             }
                         })
                         .catch(error => {
                             console.error('Paste upload error:', error);
+                            alert('이미지 붙여넣기 중 오류가 발생했습니다: ' + error.message);
                         });
                     }
                     break;
@@ -881,20 +1248,32 @@
                             'X-CSRFToken': csrfToken
                         }
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.message || '이미지 업로드에 실패했습니다.');
+                            });
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success && data.image_url) {
+                            // 이미지 미리보기 추가 (캐시 방지를 위해 타임스탬프 추가)
+                            const timestamp = new Date().getTime();
+                            const imageUrlWithTimestamp = data.image_url + (data.image_url.includes('?') ? '&' : '?') + 't=' + timestamp;
+                            
                             let imageContainer = postElement.querySelector('.post-image-container');
                             if (!imageContainer) {
                                 imageContainer = document.createElement('div');
                                 imageContainer.className = 'post-image-container mb-2';
                                 postElement.insertBefore(imageContainer, contentElement);
                             }
-                            imageContainer.innerHTML = `<img src="${data.image_url}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">`;
+                            imageContainer.innerHTML = `<img src="${imageUrlWithTimestamp}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;" onerror="this.src='${data.image_url}';">`;
                         }
                     })
                     .catch(error => {
                         console.error('Drag drop upload error:', error);
+                        alert('이미지 드래그 앤 드롭 중 오류가 발생했습니다: ' + error.message);
                     });
                 } else {
                     // 일반 파일인 경우
@@ -1090,12 +1469,23 @@
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': csrfToken
+                // Content-Type은 FormData 사용 시 브라우저가 자동으로 설정하므로 명시하지 않음
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || '이미지 업로드에 실패했습니다.');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success && data.image_url) {
-                // 이미지 미리보기 추가
+                // 이미지 미리보기 추가 (캐시 방지를 위해 타임스탬프 추가)
+                const timestamp = new Date().getTime();
+                const imageUrlWithTimestamp = data.image_url + (data.image_url.includes('?') ? '&' : '?') + 't=' + timestamp;
+                
                 const postElement = document.querySelector(`[data-post-id="${postId}"]`);
                 if (postElement) {
                     let imageContainer = postElement.querySelector('.post-image-container');
@@ -1105,17 +1495,26 @@
                         const contentElement = postElement.querySelector('.post-content');
                         if (contentElement) {
                             postElement.insertBefore(imageContainer, contentElement);
+                        } else {
+                            // contentElement가 없으면 첫 번째 자식 앞에 추가
+                            const firstChild = postElement.firstElementChild;
+                            if (firstChild) {
+                                postElement.insertBefore(imageContainer, firstChild);
+                            } else {
+                                postElement.appendChild(imageContainer);
+                            }
                         }
                     }
-                    imageContainer.innerHTML = `<img src="${data.image_url}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;">`;
+                    // 기존 이미지가 있으면 제거하고 새 이미지 추가
+                    imageContainer.innerHTML = `<img src="${imageUrlWithTimestamp}" alt="포스트 이미지" class="post-image" style="max-width: 100%; border-radius: 4px;" onerror="this.src='${data.image_url}';">`;
                 }
             } else {
-                alert('이미지 업로드에 실패했습니다.');
+                alert(data.message || '이미지 업로드에 실패했습니다.');
             }
         })
         .catch(error => {
             console.error('Image upload error:', error);
-            alert('이미지 업로드 중 오류가 발생했습니다.');
+            alert(error.message || '이미지 업로드 중 오류가 발생했습니다.');
         })
         .finally(() => {
             // 로딩 해제
@@ -1544,7 +1943,10 @@
         interact(element).draggable({
             // 모든 영역에서 드래그 허용 (삭제 버튼 제외는 자동으로 처리됨)
             allowFrom: null, // null이면 모든 영역에서 드래그 가능
-            ignoreFrom: '.post-delete-btn', // 삭제 버튼은 제외
+            ignoreFrom: '.post-delete-btn, .post-content, .post-image-upload-btn, .post-file-upload-btn', // 삭제 버튼 및 편집 요소는 제외
+            // 터치 이벤트 지원
+            inertia: false,
+            autoScroll: false,
             listeners: {
                 start: function(event) {
                     // 드래그 시작 시 dragging 클래스 추가
@@ -1640,3 +2042,4 @@
     }
 </script>
 {% endblock %}
+

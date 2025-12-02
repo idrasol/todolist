@@ -90,6 +90,18 @@
                 {% endif %}
             </div>
 
+            <div class="mb-4">
+                <label for="{{ form.category.id_for_label }}" class="form-label">
+                    {{ form.category.label }}
+                </label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                <div class="text-danger mt-1">
+                    {{ form.category.errors }}
+                </div>
+                {% endif %}
+            </div>
+
             {% if user.is_superuser %}
             <div class="mb-4">
                 <div class="form-check">

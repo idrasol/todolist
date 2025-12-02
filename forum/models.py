@@ -5,6 +5,13 @@ from django.urls import reverse
 
 class Post(models.Model):
     """게시판 포스트 모델"""
+    CATEGORY_CHOICES = [
+        ('general', '자유'),
+        ('question', '질문'),
+        ('tip', '팁/노하우'),
+        ('showcase', '작품 자랑'),
+    ]
+    
     title = models.CharField(max_length=200, verbose_name='제목')
     content = models.TextField(verbose_name='내용')
     author = models.ForeignKey(
@@ -17,6 +24,18 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='수정일')
     views = models.PositiveIntegerField(default=0, verbose_name='조회수')
     is_notice = models.BooleanField(default=False, verbose_name='공지사항')
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default='general',
+        verbose_name='카테고리'
+    )
+    likes = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='liked_posts',
+        blank=True,
+        verbose_name='좋아요'
+    )
     
     class Meta:
         verbose_name = '게시글'
@@ -33,6 +52,10 @@ class Post(models.Model):
         """조회수 증가"""
         self.views += 1
         self.save(update_fields=['views'])
+    
+    def total_likes(self):
+        """좋아요 수 반환"""
+        return self.likes.count()
 
 
 class Comment(models.Model):

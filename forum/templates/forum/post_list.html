@@ -23,6 +23,42 @@
         margin-bottom: 0.5rem;
     }
     
+    /* 카테고리 필터 탭 */
+    .category-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        background: white;
+        padding: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .category-tab {
+        padding: 0.625rem 1.25rem;
+        border-radius: 20px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        color: #718096;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+    
+    .category-tab:hover {
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateY(-2px);
+    }
+    
+    .category-tab.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+    }
+    
     /* 검색창 & 버튼 영역 */
     .forum-actions {
         display: flex;
@@ -88,7 +124,7 @@
         color: white;
     }
     
-    /* 게시글 리스트 */
+    /* 게시글 카드 리스트 */
     .forum-list {
         display: flex;
         flex-direction: column;
@@ -127,18 +163,47 @@
         font-size: 1.25rem;
         font-weight: 700;
         color: #1a202c;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
         flex-wrap: wrap;
     }
     
+    /* 카테고리 배지 */
+    .badge-category {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .badge-category-general {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    .badge-category-question {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+    
+    .badge-category-tip {
+        background: #e8f5e9;
+        color: #388e3c;
+    }
+    
+    .badge-category-showcase {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+    
     .badge-notice {
         background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
         color: white;
         font-size: 0.75rem;
-        padding: 0.25rem 0.75rem;
+        padding: 0.375rem 0.75rem;
         border-radius: 20px;
         font-weight: 600;
     }
@@ -185,6 +250,11 @@
         font-size: 0.8125rem;
     }
     
+    .like-count {
+        color: #e91e63;
+        font-weight: 600;
+    }
+    
     /* 모바일 대응 */
     @media (max-width: 768px) {
         .forum-item-content {
@@ -209,6 +279,11 @@
             max-width: 100%;
             width: 100%;
         }
+        
+        .category-tabs {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
     }
     
     .forum-empty {
@@ -224,20 +299,60 @@
         color: #cbd5e0;
         margin-bottom: 1rem;
     }
+    
+    /* 메인 화면 전체 너비 사용 */
+    .gemini-main {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        padding-top: 70px !important; /* 네비게이션 바 높이만 */
+    }
+    
+    /* forum-header 전체 너비 */
+    .forum-header {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    /* 게시판 하단 여백 */
+    .container-fluid.px-0 > .px-3 {
+        padding-bottom: 3rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="forum-header">
-    <div class="container">
-        <h1><i class="bi bi-chat-square-text"></i> 게시판</h1>
-        <p class="mb-0 opacity-75">자유롭게 의견을 나누고 소통하세요</p>
+    <div class="container-fluid px-0">
+        <div class="px-3">
+            <h1><i class="bi bi-chat-square-text"></i> 게시판</h1>
+            <p class="mb-0 opacity-75">자유롭게 의견을 나누고 소통하세요</p>
+        </div>
     </div>
 </div>
 
-<div class="container">
+<div class="container-fluid px-0">
+    <div class="px-3">
+    <!-- 카테고리 필터 탭 -->
+    <div class="category-tabs">
+        <a href="{% url 'forum:post_list' %}{% if search_query %}?search={{ search_query }}{% endif %}" 
+           class="category-tab {% if not category_filter %}active{% endif %}">
+            전체
+        </a>
+        {% for value, label in category_choices %}
+        <a href="{% url 'forum:post_list' %}?category={{ value }}{% if search_query %}&search={{ search_query }}{% endif %}" 
+           class="category-tab {% if category_filter == value %}active{% endif %}">
+            {{ label }}
+        </a>
+        {% endfor %}
+    </div>
+
     <div class="forum-actions">
         <form method="get" action="{% url 'forum:post_list' %}" class="search-form">
+            {% if category_filter %}
+            <input type="hidden" name="category" value="{{ category_filter }}">
+            {% endif %}
             <input type="text" name="search" class="form-control search-input" 
                    placeholder="제목, 내용, 작성자로 검색..." 
                    value="{{ search_query }}">
@@ -262,6 +377,9 @@
                         {% if post.is_notice %}
                         <span class="badge-notice">공지</span>
                         {% endif %}
+                        <span class="badge-category badge-category-{{ post.category }}">
+                            {{ post.get_category_display }}
+                        </span>
                         {{ post.title }}
                     </div>
                     <div class="forum-item-meta">
@@ -272,6 +390,10 @@
                         <span class="forum-item-meta-item">
                             <i class="bi bi-eye"></i>
                             <span>{{ post.views }}</span>
+                        </span>
+                        <span class="forum-item-meta-item like-count">
+                            <i class="bi bi-heart-fill"></i>
+                            <span>{{ post.total_likes }}</span>
                         </span>
                     </div>
                 </div>
@@ -299,10 +421,10 @@
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">처음</a>
+                <a class="page-link" href="?page=1{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">처음</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">이전</a>
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">이전</a>
             </li>
             {% endif %}
 
@@ -313,21 +435,22 @@
                 </li>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                    <a class="page-link" href="?page={{ num }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
                 </li>
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">다음</a>
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">다음</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">마지막</a>
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">마지막</a>
             </li>
             {% endif %}
         </ul>
     </nav>
     {% endif %}
+    </div>
 </div>
 {% endblock %}

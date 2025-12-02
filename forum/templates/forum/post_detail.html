@@ -29,6 +29,39 @@
         color: #1a202c;
         margin-bottom: 1rem;
         line-height: 1.3;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    /* 카테고리 배지 */
+    .badge-category {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .badge-category-general {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    .badge-category-question {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+    
+    .badge-category-tip {
+        background: #e8f5e9;
+        color: #388e3c;
+    }
+    
+    .badge-category-showcase {
+        background: #f3e5f5;
+        color: #7b1fa2;
     }
     
     .post-meta {
@@ -58,6 +91,72 @@
         word-wrap: break-word;
         min-height: 200px;
         padding: 2rem 0;
+    }
+    
+    /* 좋아요 버튼 섹션 */
+    .like-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem 0;
+        margin: 2rem 0;
+        border-top: 2px solid #f0f0f0;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .like-btn {
+        background: white;
+        border: 3px solid #e0e0e0;
+        border-radius: 50px;
+        padding: 1rem 2.5rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #718096;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 200px;
+        justify-content: center;
+    }
+    
+    .like-btn:hover {
+        border-color: #e91e63;
+        color: #e91e63;
+        transform: scale(1.05);
+    }
+    
+    .like-btn.liked {
+        background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+        border-color: #e91e63;
+        color: white;
+        box-shadow: 0 4px 20px rgba(233, 30, 99, 0.4);
+    }
+    
+    .like-btn.liked:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 25px rgba(233, 30, 99, 0.5);
+    }
+    
+    .like-btn i {
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .like-btn.liked i {
+        animation: heartBeat 0.5s ease;
+    }
+    
+    @keyframes heartBeat {
+        0%, 100% { transform: scale(1); }
+        25% { transform: scale(1.2); }
+        50% { transform: scale(1); }
+        75% { transform: scale(1.1); }
+    }
+    
+    .like-count {
+        font-size: 1.1rem;
     }
     
     .post-actions {
@@ -261,17 +360,37 @@
         background: #e3f2fd;
         color: #1976d2;
     }
+    
+    /* 모바일 대응 */
+    @media (max-width: 768px) {
+        .post-detail-card {
+            padding: 1.5rem;
+        }
+        
+        .post-title {
+            font-size: 1.75rem;
+        }
+        
+        .like-btn {
+            min-width: 150px;
+            padding: 0.875rem 1.5rem;
+            font-size: 1.1rem;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container-fluid">
     <div class="post-detail-card">
         <div class="post-header">
             <h1 class="post-title">
                 {% if post.is_notice %}
-                <span class="badge bg-danger me-2" style="font-size: 0.875rem; padding: 0.375rem 0.75rem;">공지</span>
+                <span class="badge bg-danger" style="font-size: 0.875rem; padding: 0.375rem 0.75rem;">공지</span>
                 {% endif %}
+                <span class="badge-category badge-category-{{ post.category }}">
+                    {{ post.get_category_display }}
+                </span>
                 {{ post.title }}
             </h1>
             <div class="post-meta">
@@ -298,6 +417,22 @@
         
         <div class="post-content">
             {{ post.content|linebreaks }}
+        </div>
+
+        <!-- 좋아요 버튼 섹션 -->
+        <div class="like-section">
+            {% if user.is_authenticated %}
+            <button class="like-btn {% if is_liked %}liked{% endif %}" 
+                    data-post-id="{{ post.pk }}" 
+                    id="like-btn">
+                <i class="bi {% if is_liked %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+                <span class="like-count" id="like-count">{{ post.total_likes }}</span>
+            </button>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> 좋아요를 누르려면 <a href="{% url 'accounts:login' %}" style="color: #1976d2; font-weight: 600;">로그인</a>이 필요합니다.
+            </div>
+            {% endif %}
         </div>
 
         <div class="post-actions">
@@ -335,7 +470,7 @@
         </form>
         {% else %}
         <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i> 댓글을 작성하려면 <a href="{% url 'login' %}" style="color: #1976d2; font-weight: 600;">로그인</a>이 필요합니다.
+            <i class="bi bi-info-circle"></i> 댓글을 작성하려면 <a href="{% url 'accounts:login' %}" style="color: #1976d2; font-weight: 600;">로그인</a>이 필요합니다.
         </div>
         {% endif %}
 
@@ -376,4 +511,50 @@
         </div>
     </div>
 </div>
+
+{% if user.is_authenticated %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const likeBtn = document.getElementById('like-btn');
+    const likeCount = document.getElementById('like-count');
+    
+    if (likeBtn) {
+        likeBtn.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch(`/forum/post/${postId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 좋아요 상태 업데이트
+                    if (data.is_liked) {
+                        likeBtn.classList.add('liked');
+                        likeBtn.querySelector('i').classList.remove('bi-heart');
+                        likeBtn.querySelector('i').classList.add('bi-heart-fill');
+                    } else {
+                        likeBtn.classList.remove('liked');
+                        likeBtn.querySelector('i').classList.remove('bi-heart-fill');
+                        likeBtn.querySelector('i').classList.add('bi-heart');
+                    }
+                    
+                    // 좋아요 수 업데이트
+                    likeCount.textContent = data.total_likes;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('좋아요 처리 중 오류가 발생했습니다.');
+            });
+        });
+    }
+});
+</script>
+{% endif %}
 {% endblock %}

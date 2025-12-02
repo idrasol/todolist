@@ -11,6 +11,8 @@
         padding: 100px 0;
         position: relative;
         overflow: hidden;
+        margin: 0;
+        width: 100%;
     }
     
     .hero-section::before {
@@ -33,6 +35,8 @@
     .features-section {
         padding: 80px 0;
         background: #f8f9fa;
+        margin: 0;
+        width: 100%;
     }
     
     .feature-card {
@@ -72,6 +76,8 @@
     .howto-section {
         padding: 80px 0;
         background: white;
+        margin: 0;
+        width: 100%;
     }
     
     .step-card {
@@ -118,6 +124,22 @@
         background: #2d3748;
         color: white;
         padding: 60px 0 30px;
+        margin: 0;
+        width: 100%;
+    }
+    
+    /* body 여백 제거 */
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* 메인 화면 전체 너비 사용 */
+    .gemini-main {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        padding-top: 70px !important; /* 네비게이션 바 높이만 */
     }
     
     .footer-logo {
@@ -158,9 +180,9 @@
 {% block content %}
 <!-- 히어로 섹션 -->
 <section class="hero-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 hero-content text-center">
+    <div class="container-fluid px-0">
+        <div class="row g-0">
+            <div class="col-12 hero-content text-center px-3">
                 <h1 class="display-2 fw-bold mb-4">
                     Moa에 오신 것을 환영합니다
                 </h1>
@@ -178,15 +200,15 @@
 
 <!-- 특징 소개 섹션 -->
 <section class="features-section">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-12 text-center">
+    <div class="container-fluid px-0">
+        <div class="row g-0 mb-5">
+            <div class="col-12 text-center px-3">
                 <h2 class="display-4 fw-bold mb-3" style="color: #2d3748;">왜 Moa인가요?</h2>
                 <p class="lead text-muted">간단하고 직관적인 협업 도구</p>
             </div>
         </div>
-        <div class="row g-4">
-            <div class="col-12 col-md-4">
+        <div class="row g-0 gx-2">
+            <div class="col-12 col-md-4 px-2">
                 <div class="feature-card">
                     <span class="feature-icon">⚡</span>
                     <h3 class="feature-title">실시간 협업</h3>
@@ -196,7 +218,7 @@
                     </p>
                 </div>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 px-2">
                 <div class="feature-card">
                     <span class="feature-icon">🎨</span>
                     <h3 class="feature-title">직관적인 드래그 앤 드롭</h3>
@@ -206,7 +228,7 @@
                     </p>
                 </div>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 px-2">
                 <div class="feature-card">
                     <span class="feature-icon">🚀</span>
                     <h3 class="feature-title">로그인 없이 바로 시작</h3>
@@ -222,15 +244,15 @@
 
 <!-- 사용 방법 섹션 -->
 <section class="howto-section">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-12 text-center">
+    <div class="container-fluid px-0">
+        <div class="row g-0 mb-5">
+            <div class="col-12 text-center px-3">
                 <h2 class="display-4 fw-bold mb-3" style="color: #2d3748;">사용 방법</h2>
                 <p class="lead text-muted">4단계로 시작하는 Moa</p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12 col-md-8 offset-md-2">
+        <div class="row g-0">
+            <div class="col-12 col-md-8 offset-md-2 px-3">
                 <div class="step-card">
                     <div class="d-flex align-items-start">
                         <span class="step-number">1</span>
@@ -280,8 +302,8 @@
                 </div>
             </div>
         </div>
-        <div class="row mt-5">
-            <div class="col-12 text-center">
+        <div class="row g-0 mt-5">
+            <div class="col-12 text-center px-3">
                 <a href="{% url 'collaboration:board_list' %}" class="btn btn-gemini-primary btn-lg px-5 py-3">
                     <i class="bi bi-arrow-right-circle me-2"></i> 지금 시작하기
                 </a>
@@ -292,9 +314,9 @@
 
 <!-- 푸터 섹션 -->
 <footer class="footer-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 col-md-4 mb-4 mb-md-0">
+    <div class="container-fluid px-0">
+        <div class="row g-0 gx-2">
+            <div class="col-12 col-md-4 mb-4 mb-md-0 px-2">
                 <div class="footer-logo">
                     <i class="bi bi-grid-3x3-gap me-2"></i> Moa
                 </div>
@@ -302,7 +324,7 @@
                     직관적인 협업 도구로 아이디어를 모으고 공유하세요.
                 </p>
             </div>
-            <div class="col-12 col-md-4 mb-4 mb-md-0">
+            <div class="col-12 col-md-4 mb-4 mb-md-0 px-2">
                 <h5 style="margin-bottom: 1rem;">빠른 링크</h5>
                 <ul class="footer-links">
                     <li><a href="{% url 'collaboration:board_list' %}">보드 목록</a></li>
@@ -315,7 +337,7 @@
                     {% endif %}
                 </ul>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 px-2">
                 <h5 style="margin-bottom: 1rem;">정보</h5>
                 <ul class="footer-links">
                     <li><a href="#">이용약관</a></li>
