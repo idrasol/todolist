@@ -41,96 +41,49 @@
         align-items: center;
     }
     
-    /* 모바일에서 카테고리 필터 드롭다운 스타일 */
+    /* 모바일 필터 드롭다운 스타일 */
     @media (max-width: 767px) {
         .category-filter-wrapper {
             width: 100%;
         }
         
-        .category-tabs.collapse {
-            background: white;
-            border-radius: 12px;
-            padding: 0.5rem 0;
-            margin-top: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .category-tabs.collapse .category-tab {
+        .mobile-filter-dropdown {
             width: 100%;
             text-align: left;
-            margin-bottom: 0;
+        }
+        
+        .mobile-filter-menu {
+            width: 100% !important;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e8eaed;
+            padding: 0.5rem 0;
+            margin-top: 0.5rem;
+        }
+        
+        .mobile-filter-menu .dropdown-item {
             padding: 0.875rem 1.25rem;
-            border-radius: 0;
-            border: none;
-            border-bottom: 1px solid #e8eaed;
-            background: transparent;
             color: #2d3748;
             font-weight: 400;
-            display: block;
-            text-decoration: none;
-            cursor: pointer;
             transition: background-color 0.2s ease;
             -webkit-tap-highlight-color: transparent;
         }
         
-        .category-tabs.collapse .category-tab:first-child {
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
+        .mobile-filter-menu .dropdown-item:hover,
+        .mobile-filter-menu .dropdown-item:active {
+            background-color: #f1f3f4;
+            color: #2d3748;
         }
         
-        .category-tabs.collapse .category-tab:last-child {
-            border-bottom: none;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-        }
-        
-        .category-tabs.collapse .category-tab:hover,
-        .category-tabs.collapse .category-tab:active {
-            background: #f1f3f4;
-            transform: none;
-            border-color: #e8eaed;
-        }
-        
-        .category-tabs.collapse .category-tab.active {
+        .mobile-filter-menu .dropdown-item.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-color: transparent;
             font-weight: 500;
         }
         
-        .category-tabs.collapse .category-tab.active:hover {
+        .mobile-filter-menu .dropdown-item.active:hover {
             background: linear-gradient(135deg, #5568d3 0%, #6a3d8f 100%);
-        }
-        
-        /* 필터 버튼 아이콘 애니메이션 제거 */
-        .category-filter-toggle i.bi-chevron-down {
-            transition: none !important;
-            transform: none !important;
-        }
-        
-        .category-filter-toggle[aria-expanded="true"] i.bi-chevron-down {
-            transform: none !important;
-        }
-        
-        /* 필터 버튼과 글쓰기 버튼이 나란히 있을 때 */
-        .forum-actions {
-            position: relative;
-        }
-        
-        .category-filter-wrapper {
-            position: relative;
-        }
-        
-        #categoryFilterMenu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            margin-top: 0.5rem;
+            color: white;
         }
     }
     
@@ -545,29 +498,45 @@
     <div class="forum-actions">
         <!-- 카테고리 필터 탭 (왼쪽) - 데스크탑에서는 항상 표시, 모바일에서는 드롭다운 -->
         <div class="category-filter-wrapper">
-            <!-- 모바일에서만 보이는 필터 버튼 -->
-            <button class="btn btn-outline-secondary category-filter-toggle d-md-none" 
-                    type="button" 
-                    data-bs-toggle="collapse" 
-                    data-bs-target="#categoryFilterMenu" 
-                    aria-expanded="false" 
-                    aria-controls="categoryFilterMenu"
-                    style="font-weight: 500; color: #2d3748; border-color: #d0d0d0; display: flex; justify-content: space-between; align-items: center;">
-                <span>
-                    <i class="bi bi-sliders me-2"></i>
-                    {% if category_filter %}
-                        {% for value, label in category_choices %}
-                            {% if category_filter == value %}{{ label }}{% endif %}
-                        {% endfor %}
-                    {% else %}
-                        전체
-                    {% endif %}
-                </span>
-                <i class="bi bi-chevron-down"></i>
-            </button>
+            <!-- 모바일에서만 보이는 필터 드롭다운 -->
+            <div class="dropdown d-md-none">
+                <button class="btn btn-outline-secondary dropdown-toggle mobile-filter-dropdown" 
+                        type="button" 
+                        id="mobileFilterDropdown" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        style="font-weight: 500; color: #2d3748; border-color: #d0d0d0; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <span>
+                        <i class="bi bi-sliders me-2"></i>
+                        {% if category_filter %}
+                            {% for value, label in category_choices %}
+                                {% if category_filter == value %}{{ label }}{% endif %}
+                            {% endfor %}
+                        {% else %}
+                            전체
+                        {% endif %}
+                    </span>
+                </button>
+                <ul class="dropdown-menu mobile-filter-menu" aria-labelledby="mobileFilterDropdown" style="width: 100%;">
+                    <li>
+                        <a class="dropdown-item {% if not category_filter %}active{% endif %}" 
+                           href="{% url 'forum:post_list' %}{% if search_query %}?search={{ search_query }}{% endif %}">
+                            전체
+                        </a>
+                    </li>
+                    {% for value, label in category_choices %}
+                    <li>
+                        <a class="dropdown-item {% if category_filter == value %}active{% endif %}" 
+                           href="{% url 'forum:post_list' %}?category={{ value }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                            {{ label }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
             
-            <!-- 카테고리 필터 탭 (데스크탑에서는 항상 표시, 모바일에서는 드롭다운) -->
-            <div class="category-tabs collapse d-md-block" id="categoryFilterMenu">
+            <!-- 카테고리 필터 탭 (데스크탑에서는 항상 표시) -->
+            <div class="category-tabs d-none d-md-flex" id="categoryFilterMenu">
                 <a href="{% url 'forum:post_list' %}{% if search_query %}?search={{ search_query }}{% endif %}" 
                    class="category-tab {% if not category_filter %}active{% endif %}">
                     전체
@@ -699,66 +668,22 @@
 </div>
 
 <script>
-// 모바일 필터 메뉴 자동 닫기
+// 모바일 필터 드롭다운 자동 닫기 (Bootstrap dropdown은 기본적으로 자동으로 닫히지만, 확실하게 처리)
 document.addEventListener('DOMContentLoaded', function() {
-    const filterMenu = document.getElementById('categoryFilterMenu');
-    const filterToggle = document.querySelector('.category-filter-toggle');
+    const dropdownItems = document.querySelectorAll('.mobile-filter-menu .dropdown-item');
     
-    if (!filterMenu) return;
-    
-    const filterTabs = filterMenu.querySelectorAll('.category-tab');
-    
-    function closeFilterMenu() {
-        // 모바일에서만 작동
-        if (window.innerWidth >= 768) return;
-        
-        const collapseElement = document.getElementById('categoryFilterMenu');
-        if (!collapseElement) return;
-        
-        // 즉시 클래스 제거 (가장 확실한 방법)
-        collapseElement.classList.remove('show');
-        collapseElement.classList.add('collapse');
-        
-        // 스타일도 직접 제거
-        collapseElement.style.display = 'none';
-        
-        // Bootstrap Collapse 인스턴스가 있으면 hide() 호출
-        const bsCollapse = bootstrap.Collapse.getInstance(collapseElement);
-        if (bsCollapse) {
-            bsCollapse.hide();
-        }
-        
-        // 토글 버튼의 aria-expanded 속성 업데이트
-        if (filterToggle) {
-            filterToggle.setAttribute('aria-expanded', 'false');
-            filterToggle.classList.remove('active');
-        }
-    }
-    
-    filterTabs.forEach(function(tab) {
-        tab.addEventListener('click', function(e) {
-            // 모바일에서만 즉시 닫기 (페이지 이동 전에 처리)
-            if (window.innerWidth < 768) {
-                closeFilterMenu();
+    dropdownItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            // 드롭다운 인스턴스 가져오기
+            const dropdownElement = document.getElementById('mobileFilterDropdown');
+            if (dropdownElement) {
+                const bsDropdown = bootstrap.Dropdown.getInstance(dropdownElement);
+                if (bsDropdown) {
+                    bsDropdown.hide();
+                }
             }
-        }, true); // capture phase에서 먼저 실행
+        });
     });
-    
-    // Bootstrap collapse 이벤트 리스너 (추가 안전장치)
-    if (filterMenu) {
-        filterMenu.addEventListener('hidden.bs.collapse', function() {
-            if (filterToggle) {
-                filterToggle.setAttribute('aria-expanded', 'false');
-            }
-        });
-        
-        // show 이벤트에서도 토글 버튼 상태 업데이트
-        filterMenu.addEventListener('shown.bs.collapse', function() {
-            if (filterToggle) {
-                filterToggle.setAttribute('aria-expanded', 'true');
-            }
-        });
-    }
 });
 </script>
 {% endblock %}
