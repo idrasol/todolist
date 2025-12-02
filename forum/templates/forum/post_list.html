@@ -62,14 +62,18 @@
             width: 100%;
             text-align: left;
             margin-bottom: 0;
-            padding: 0.75rem 1rem;
+            padding: 0.875rem 1.25rem;
             border-radius: 0;
             border: none;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #e8eaed;
             background: transparent;
             color: #2d3748;
             font-weight: 400;
             display: block;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .category-tabs.collapse .category-tab:first-child {
@@ -83,16 +87,22 @@
             border-bottom-right-radius: 12px;
         }
         
-        .category-tabs.collapse .category-tab:hover {
-            background: #f8f9fa;
+        .category-tabs.collapse .category-tab:hover,
+        .category-tabs.collapse .category-tab:active {
+            background: #f1f3f4;
             transform: none;
-            border-color: #f0f0f0;
+            border-color: #e8eaed;
         }
         
         .category-tabs.collapse .category-tab.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-color: transparent;
+            font-weight: 500;
+        }
+        
+        .category-tabs.collapse .category-tab.active:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #6a3d8f 100%);
         }
         
         /* 필터 버튼 아이콘 애니메이션 제거 */
@@ -543,7 +553,16 @@
                     aria-expanded="false" 
                     aria-controls="categoryFilterMenu"
                     style="font-weight: 500; color: #2d3748; border-color: #d0d0d0; display: flex; justify-content: space-between; align-items: center;">
-                <span><i class="bi bi-sliders me-2"></i>필터</span>
+                <span>
+                    <i class="bi bi-sliders me-2"></i>
+                    {% if category_filter %}
+                        {% for value, label in category_choices %}
+                            {% if category_filter == value %}{{ label }}{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        전체
+                    {% endif %}
+                </span>
                 <i class="bi bi-chevron-down"></i>
             </button>
             
@@ -696,37 +715,33 @@ document.addEventListener('DOMContentLoaded', function() {
         const collapseElement = document.getElementById('categoryFilterMenu');
         if (!collapseElement) return;
         
-        // Bootstrap Collapse 인스턴스 가져오기 또는 생성
-        let bsCollapse = bootstrap.Collapse.getInstance(collapseElement);
-        
-        if (!bsCollapse) {
-            bsCollapse = new bootstrap.Collapse(collapseElement, {
-                toggle: false
-            });
-        }
-        
-        // 메뉴가 열려있으면 닫기
-        if (collapseElement.classList.contains('show')) {
-            bsCollapse.hide();
-        }
-        
-        // 직접 클래스 제거 (추가 안전장치)
+        // 즉시 클래스 제거 (가장 확실한 방법)
         collapseElement.classList.remove('show');
         collapseElement.classList.add('collapse');
+        
+        // 스타일도 직접 제거
+        collapseElement.style.display = 'none';
+        
+        // Bootstrap Collapse 인스턴스가 있으면 hide() 호출
+        const bsCollapse = bootstrap.Collapse.getInstance(collapseElement);
+        if (bsCollapse) {
+            bsCollapse.hide();
+        }
         
         // 토글 버튼의 aria-expanded 속성 업데이트
         if (filterToggle) {
             filterToggle.setAttribute('aria-expanded', 'false');
+            filterToggle.classList.remove('active');
         }
     }
     
     filterTabs.forEach(function(tab) {
         tab.addEventListener('click', function(e) {
-            // 약간의 지연을 주어 클릭 이벤트가 완전히 처리되도록 함
-            setTimeout(function() {
+            // 모바일에서만 즉시 닫기 (페이지 이동 전에 처리)
+            if (window.innerWidth < 768) {
                 closeFilterMenu();
-            }, 100);
-        });
+            }
+        }, true); // capture phase에서 먼저 실행
     });
     
     // Bootstrap collapse 이벤트 리스너 (추가 안전장치)
@@ -734,6 +749,13 @@ document.addEventListener('DOMContentLoaded', function() {
         filterMenu.addEventListener('hidden.bs.collapse', function() {
             if (filterToggle) {
                 filterToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+        
+        // show 이벤트에서도 토글 버튼 상태 업데이트
+        filterMenu.addEventListener('shown.bs.collapse', function() {
+            if (filterToggle) {
+                filterToggle.setAttribute('aria-expanded', 'true');
             }
         });
     }
