@@ -683,26 +683,60 @@
 // 모바일 필터 메뉴 자동 닫기
 document.addEventListener('DOMContentLoaded', function() {
     const filterMenu = document.getElementById('categoryFilterMenu');
-    const filterTabs = filterMenu ? filterMenu.querySelectorAll('.category-tab') : [];
+    const filterToggle = document.querySelector('.category-filter-toggle');
+    
+    if (!filterMenu) return;
+    
+    const filterTabs = filterMenu.querySelectorAll('.category-tab');
+    
+    function closeFilterMenu() {
+        // 모바일에서만 작동
+        if (window.innerWidth >= 768) return;
+        
+        const collapseElement = document.getElementById('categoryFilterMenu');
+        if (!collapseElement) return;
+        
+        // Bootstrap Collapse 인스턴스 가져오기 또는 생성
+        let bsCollapse = bootstrap.Collapse.getInstance(collapseElement);
+        
+        if (!bsCollapse) {
+            bsCollapse = new bootstrap.Collapse(collapseElement, {
+                toggle: false
+            });
+        }
+        
+        // 메뉴가 열려있으면 닫기
+        if (collapseElement.classList.contains('show')) {
+            bsCollapse.hide();
+        }
+        
+        // 직접 클래스 제거 (추가 안전장치)
+        collapseElement.classList.remove('show');
+        collapseElement.classList.add('collapse');
+        
+        // 토글 버튼의 aria-expanded 속성 업데이트
+        if (filterToggle) {
+            filterToggle.setAttribute('aria-expanded', 'false');
+        }
+    }
     
     filterTabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-            // Bootstrap Collapse 인스턴스 가져오기
-            const collapseElement = document.getElementById('categoryFilterMenu');
-            if (collapseElement && collapseElement.classList.contains('show')) {
-                const bsCollapse = bootstrap.Collapse.getInstance(collapseElement);
-                if (bsCollapse) {
-                    bsCollapse.hide();
-                } else {
-                    // 인스턴스가 없으면 새로 생성하여 닫기
-                    const newCollapse = new bootstrap.Collapse(collapseElement, {
-                        toggle: false
-                    });
-                    newCollapse.hide();
-                }
-            }
+        tab.addEventListener('click', function(e) {
+            // 약간의 지연을 주어 클릭 이벤트가 완전히 처리되도록 함
+            setTimeout(function() {
+                closeFilterMenu();
+            }, 100);
         });
     });
+    
+    // Bootstrap collapse 이벤트 리스너 (추가 안전장치)
+    if (filterMenu) {
+        filterMenu.addEventListener('hidden.bs.collapse', function() {
+            if (filterToggle) {
+                filterToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
 });
 </script>
 {% endblock %}
