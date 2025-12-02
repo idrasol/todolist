@@ -220,10 +220,10 @@
         border: 1px solid #e8eaed;
     }
     
-    /* 모바일에서 사이드바 바텀 시트 스타일 */
+    /* 모바일에서 사이드바 최적화 */
     @media (max-width: 768px) {
         .sidebar {
-            position: relative !important; /* 모바일에서는 일반 배치 */
+            position: relative !important;
             top: auto !important;
             width: 100%;
             border-radius: 12px;
@@ -237,6 +237,19 @@
             margin-top: 1rem;
         }
         
+        /* 모바일에서도 가로 레이아웃 유지 */
+        .row.gx-0 {
+            flex-direction: row;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .row.gx-0 > .col-12 {
+            flex: 0 0 auto;
+            min-width: 280px;
+        }
+        
         /* 모바일에서 캔버스와 사이드바 간격 */
         .order-1 {
             margin-bottom: 1rem;
@@ -246,7 +259,7 @@
             margin-top: 1rem;
         }
         
-        /* 모바일에서 색상 팔레트 가로 스크롤 방지 */
+        /* 모바일에서 색상 팔레트 가로 스크롤 */
         .color-palette {
             grid-template-columns: repeat(5, 1fr);
             gap: 0.5rem;
@@ -260,6 +273,17 @@
         
         .color-item i {
             font-size: 1.2rem;
+        }
+        
+        /* 모바일에서 캔버스 해상도 조정 */
+        .canvas-size-640x480,
+        .canvas-size-800x480,
+        .canvas-size-1280x720,
+        .canvas-size-1920x1080 {
+            width: 100% !important;
+            max-width: 100%;
+            height: auto !important;
+            min-height: 400px;
         }
     }
     
@@ -723,9 +747,15 @@
 </div>
 
     <div class="row gx-0">
-    <!-- 왼쪽 사이드바 (col-md-2) - 모바일에서는 하단에 배치 -->
+    <!-- 왼쪽 사이드바 (col-md-2) - 모바일에서도 가로로 배치 -->
     <div class="col-12 col-md-2 mb-4 order-2 order-md-1 px-2">
         <div class="sidebar sidebar-mobile">
+            <!-- 모바일에서 사이드바 접기 버튼 -->
+            <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center mb-3 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSidebar" aria-expanded="false" aria-controls="mobileSidebar" style="font-weight: 500; color: #2d3748; border-color: #d0d0d0;">
+                <span><i class="bi bi-sliders me-2"></i>메뉴</span>
+                <i class="bi bi-chevron-down"></i>
+            </button>
+            <div class="collapse d-md-block" id="mobileSidebar">
             <!-- 포스트잇 드롭다운 -->
             <div class="mb-3">
                 <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#postitMenu" aria-expanded="false" aria-controls="postitMenu" style="font-weight: 500; color: #2d3748; border-color: #d0d0d0;">
@@ -777,10 +807,11 @@
                     </select>
                 </div>
             </div>
+            </div>
         </div>
     </div>
     
-    <!-- 오른쪽 캔버스 영역 (col-md-10) - 모바일에서는 상단에 배치 -->
+    <!-- 오른쪽 캔버스 영역 (col-md-10) - 모바일에서도 가로로 배치 -->
     <div class="col-12 col-md-10 order-1 order-md-2 px-2">
         <div class="gemini-card p-0">
     <div class="gemini-canvas canvas-theme-default" id="canvas">

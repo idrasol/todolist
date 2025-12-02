@@ -279,7 +279,77 @@
     
     @media (max-width: 768px) {
         .layout-masonry .board-list-container {
-            column-count: 1;
+            column-count: 2;
+        }
+        
+        /* 모바일에서도 가로 레이아웃 유지 */
+        .row.gx-0 {
+            flex-direction: row;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .row.gx-0 > .col-12 {
+            flex: 0 0 auto;
+        }
+        
+        .board-list-sidebar {
+            margin-bottom: 1rem;
+            min-width: 200px;
+        }
+        
+        .col-12.col-md-9.col-lg-10 {
+            min-width: calc(100% - 220px);
+        }
+        
+        .layout-list .board-thumbnail {
+            width: 150px;
+        }
+        
+        /* 모바일에서 카드 크기 조정 */
+        .board-thumbnail {
+            height: 150px;
+        }
+        
+        .layout-grid .board-list-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .layout-compact .board-list-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .layout-tile .board-list-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .layout-gallery .board-list-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .layout-grid .board-list-container,
+        .layout-compact .board-list-container,
+        .layout-tile .board-list-container,
+        .layout-gallery .board-list-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .board-thumbnail {
+            height: 120px;
+        }
+        
+        .board-card-body {
+            padding: 0.75rem;
+        }
+        
+        .board-card-title {
+            font-size: 1rem;
         }
     }
     
@@ -473,33 +543,39 @@
         <!-- 사이드바 -->
         <div class="col-12 col-md-3 col-lg-2 mb-3">
             <div class="board-list-sidebar">
-                <label class="form-label d-flex align-items-center mb-2">
-                    <i class="bi bi-layout-three-columns me-2"></i>카드 배치
-                </label>
-                <select id="layoutSelect" class="form-select form-select-sm mb-3">
-                    <option value="grid" selected>그리드</option>
-                    <option value="list">리스트</option>
-                    <option value="masonry">Masonry</option>
-                    <option value="compact">컴팩트</option>
-                    <option value="tile">타일</option>
-                    <option value="card">카드</option>
-                    <option value="table">테이블</option>
-                    <option value="gallery">갤러리</option>
-                </select>
-                
-                <label class="form-label d-flex align-items-center mb-2">
-                    <i class="bi bi-palette me-2"></i>배경 테마
-                </label>
-                <select id="themeSelect" class="form-select form-select-sm">
-                    <option value="default" selected>기본</option>
-                    <option value="dark">다크</option>
-                    <option value="light">라이트</option>
-                    <option value="colorful">컬러풀</option>
-                    <option value="minimal">미니멀</option>
-                    <option value="creamy">크리미</option>
-                    <option value="blue">블루</option>
-                    <option value="green">그린</option>
-                </select>
+                <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center mb-3 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-expanded="false" aria-controls="sidebarMenu" style="font-weight: 500; color: #2d3748; border-color: #d0d0d0;">
+                    <span><i class="bi bi-sliders me-2"></i>필터</span>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <div class="collapse d-md-block" id="sidebarMenu">
+                    <label class="form-label d-flex align-items-center mb-2">
+                        <i class="bi bi-layout-three-columns me-2"></i>카드 배치
+                    </label>
+                    <select id="layoutSelect" class="form-select form-select-sm mb-3">
+                        <option value="grid" selected>그리드</option>
+                        <option value="list">리스트</option>
+                        <option value="masonry">Masonry</option>
+                        <option value="compact">컴팩트</option>
+                        <option value="tile">타일</option>
+                        <option value="card">카드</option>
+                        <option value="table">테이블</option>
+                        <option value="gallery">갤러리</option>
+                    </select>
+                    
+                    <label class="form-label d-flex align-items-center mb-2">
+                        <i class="bi bi-palette me-2"></i>배경 테마
+                    </label>
+                    <select id="themeSelect" class="form-select form-select-sm">
+                        <option value="default" selected>기본</option>
+                        <option value="dark">다크</option>
+                        <option value="light">라이트</option>
+                        <option value="colorful">컬러풀</option>
+                        <option value="minimal">미니멀</option>
+                        <option value="creamy">크리미</option>
+                        <option value="blue">블루</option>
+                        <option value="green">그린</option>
+                    </select>
+                </div>
             </div>
         </div>
         
@@ -507,7 +583,7 @@
         <div class="col-12 col-md-9 col-lg-10 ps-md-4">
     {% if boards %}
     <div class="board-list-container layout-grid" id="boardListContainer">
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-0 gx-2">
+    <div class="row row-cols-2 row-cols-md-2 row-cols-lg-3 g-0 gx-2">
         {% for board in boards %}
             {% with thumbnail_url=board.get_thumbnail_url gradient_colors=board.get_gradient_colors %}
             <div class="col mb-3">
