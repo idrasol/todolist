@@ -1,0 +1,92 @@
+{% extends 'collaboration/base.html' %}
+
+{% block title %}삭제 확인 - 게시판 - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #f8f9fa;
+        padding-top: 80px;
+    }
+    .delete-confirm-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .delete-icon {
+        font-size: 4rem;
+        color: #dc3545;
+        margin-bottom: 1.5rem;
+    }
+    .delete-confirm-card h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    .post-preview {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        text-align: left;
+    }
+    .post-preview-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    .post-preview-meta {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    .btn-delete {
+        background: #dc3545;
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: background 0.2s;
+    }
+    .btn-delete:hover {
+        background: #c82333;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="delete-confirm-card">
+        <div class="delete-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h2>게시글 삭제</h2>
+        <p class="text-muted mb-4">정말로 이 게시글을 삭제하시겠습니까?<br>삭제된 게시글은 복구할 수 없습니다.</p>
+
+        <div class="post-preview">
+            <div class="post-preview-title">{{ post.title }}</div>
+            <div class="post-preview-meta">
+                작성자: {{ post.author.username }} | 작성일: {{ post.created_at|date:"Y-m-d H:i" }}
+            </div>
+        </div>
+
+        <form method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-delete me-2">
+                <i class="bi bi-trash"></i> 삭제
+            </button>
+        </form>
+        <a href="{% url 'forum:post_detail' post.pk %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> 취소
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+

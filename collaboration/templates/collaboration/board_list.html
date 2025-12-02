@@ -1,0 +1,201 @@
+{% extends 'collaboration/base.html' %}
+
+{% block title %}보드 목록 - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #f8f9fa;
+        padding-top: 80px;
+    }
+
+    .board-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        position: relative;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+    }
+    
+    .board-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+    
+    /* 컬러 라인 (각 보드별로 다른 색상) */
+    .board-color-bar {
+        height: 4px;
+        width: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* 보드별 다른 색상 라인을 위한 클래스 */
+    .board-card:nth-child(1) .board-color-bar { background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); }
+    .board-card:nth-child(2) .board-color-bar { background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); }
+    .board-card:nth-child(3) .board-color-bar { background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%); }
+    .board-card:nth-child(4) .board-color-bar { background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%); }
+    .board-card:nth-child(5) .board-color-bar { background: linear-gradient(90deg, #fa709a 0%, #fee140 100%); }
+    .board-card:nth-child(6) .board-color-bar { background: linear-gradient(90deg, #30cfd0 0%, #330867 100%); }
+    
+    .board-card-body {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .board-card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1a202c;
+        line-height: 1.4;
+    }
+    
+    .board-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        flex-wrap: wrap;
+    }
+    
+    .board-card-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #718096;
+        font-size: 0.875rem;
+    }
+    
+    .board-card-meta-item i {
+        font-size: 0.875rem;
+        color: #a0aec0;
+    }
+    
+    /* 삭제 버튼 - 호버 시에만 표시 */
+    .board-delete-btn {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background: rgba(255, 255, 255, 0.95);
+        border: none;
+        color: #e53e3e;
+        font-size: 1rem;
+        padding: 0.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        z-index: 10;
+        opacity: 0;
+        transform: scale(0.9);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .board-card:hover .board-delete-btn {
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+    .board-delete-btn:hover {
+        background: #fff;
+        color: #c53030;
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(229, 62, 62, 0.2);
+    }
+    
+    .board-delete-btn:active {
+        transform: scale(0.95);
+    }
+    
+    /* 비공개 배지 */
+    .badge-private {
+        background: #718096;
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        margin-left: 0.5rem;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="gemini-header">
+    <h1>
+        <i class="bi bi-grid-3x3-gap"></i> 보드 목록
+    </h1>
+    <a href="{% url 'collaboration:board_create' %}" class="btn btn-gemini-primary">
+        <i class="bi bi-plus-circle"></i> 새 보드 만들기
+    </a>
+</div>
+
+{% if boards %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5">
+        {% for board in boards %}
+            <div class="col">
+                <a href="{% url 'collaboration:board_detail' board.id %}" class="board-card">
+                    <!-- 컬러 라인 -->
+                    <div class="board-color-bar"></div>
+                    
+                    <!-- 삭제 버튼 (호버 시에만 표시) -->
+                    {% if user.is_authenticated %}
+                        {% if board.creator == user or user.is_superuser %}
+                    <form method="POST" action="{% url 'collaboration:board_delete' board.id %}" 
+                          onsubmit="event.stopPropagation(); return confirm('정말로 이 보드를 삭제하시겠습니까?');" 
+                          style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="board-delete-btn" title="보드 삭제">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                        {% endif %}
+                    {% endif %}
+                    
+                    <!-- 카드 본문 -->
+                    <div class="board-card-body">
+                        <!-- 제목 -->
+                        <h5 class="board-card-title">
+                            {{ board.title }}
+                            {% if not board.is_public %}
+                                <span class="badge-private">
+                                    <i class="bi bi-lock-fill"></i> 비공개
+                                </span>
+                            {% endif %}
+                        </h5>
+                        
+                        <!-- 메타 정보 (하단 배치) -->
+                        <div class="board-card-meta">
+                            <span class="board-card-meta-item">
+                                <i class="bi bi-calendar3"></i>
+                                <span>{{ board.created_at|date:"Y-m-d" }}</span>
+                            </span>
+                            <span class="board-card-meta-item">
+                                <i class="bi bi-sticky"></i>
+                                <span>{{ board.posts.count }}개</span>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="gemini-empty-state">
+        <i class="bi bi-inbox"></i>
+        <h4 class="mt-3 mb-2">등록된 보드가 없습니다</h4>
+        <p class="text-muted">위의 버튼을 클릭하여 새 보드를 만들어보세요!</p>
+    </div>
+{% endif %}
+{% endblock %}

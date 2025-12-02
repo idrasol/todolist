@@ -1,0 +1,48 @@
+{% extends 'collaboration/base.html' %}
+
+{% block title %}{{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 60vh;">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3 gemini-text-primary">
+            <i class="bi bi-lightbulb"></i> AI 클래스 캔버스
+        </h1>
+        <p class="lead text-muted mb-5">
+            미래 학습을 위한 가장 스마트한 협업 플랫폼
+        </p>
+        <a href="{% url 'collaboration:board_list' %}" class="btn btn-gemini-primary btn-lg">
+            <i class="bi bi-arrow-right-circle"></i> 보드 목록으로 가기
+        </a>
+    </div>
+    
+    <div class="row g-4 mt-4" style="max-width: 800px;">
+        <div class="col-md-4 text-center">
+            <div class="gemini-card">
+                <i class="bi bi-people display-4 gemini-text-primary mb-3"></i>
+                <h5>협업 중심</h5>
+                <p class="text-muted small">실시간으로 함께 작업하고 아이디어를 공유하세요</p>
+            </div>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="gemini-card">
+                <i class="bi bi-lightning-charge display-4 gemini-text-primary mb-3"></i>
+                <h5>직관적 인터페이스</h5>
+                <p class="text-muted small">드래그 앤 드롭으로 쉽고 빠르게 구성하세요</p>
+            </div>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="gemini-card">
+                <i class="bi bi-shield-check display-4 gemini-text-primary mb-3"></i>
+                <h5>안전한 공간</h5>
+                <p class="text-muted small">학습 자료를 안전하게 보관하고 관리하세요</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+

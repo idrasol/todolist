@@ -1,0 +1,69 @@
+{% extends 'collaboration/base.html' %}
+
+{% block title %}내 프로필 - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="gemini-header mb-4">
+    <h1>
+        <i class="bi bi-person-circle"></i> 내 프로필
+    </h1>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="gemini-card">
+            <div class="text-center">
+                <div class="mb-3">
+                    <i class="bi bi-person-circle" style="font-size: 5rem; color: #667eea;"></i>
+                </div>
+                <h4>{{ user.username }}</h4>
+                <p class="text-muted mb-0">회원가입일: {{ user.date_joined|date:"Y-m-d" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="gemini-card">
+            <h5 class="mb-4">
+                <i class="bi bi-kanban"></i> 내가 만든 보드 ({{ boards.count }}개)
+            </h5>
+            
+            {% if boards %}
+                <div class="row g-3">
+                    {% for board in boards %}
+                        <div class="col-12 col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ board.title }}</h6>
+                                    <p class="card-text small text-muted mb-2">
+                                        <i class="bi bi-calendar3"></i> {{ board.created_at|date:"Y-m-d H:i" }}
+                                    </p>
+                                    <p class="card-text small text-muted mb-3">
+                                        <i class="bi bi-sticky"></i> {{ board.posts.count }}개 포스트
+                                    </p>
+                                    <a href="{% url 'collaboration:board_detail' board.id %}" class="btn btn-gemini-primary btn-sm">
+                                        <i class="bi bi-arrow-right-circle"></i> 보드 열기
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="gemini-empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p class="mt-3 mb-0">아직 만든 보드가 없습니다.</p>
+                    <a href="{% url 'collaboration:board_create' %}" class="btn btn-gemini-primary mt-3">
+                        <i class="bi bi-plus-circle"></i> 새 보드 만들기
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
