@@ -6,7 +6,7 @@
 <style>
     body {
         background: #f8f9fa;
-        padding-top: 80px;
+        padding-top: 60px;
     }
     
     .post-detail-card {
@@ -361,6 +361,53 @@
         color: #1976d2;
     }
     
+    /* 이미지 섹션 */
+    .post-image-section {
+        margin: 2rem 0;
+        text-align: center;
+    }
+    
+    .post-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* 파일 다운로드 섹션 */
+    .post-file-section {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border: 2px dashed #e0e0e0;
+    }
+    
+    .btn-download {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-download i {
+        font-size: 1.2rem;
+    }
+    
+    .file-name {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
     /* 모바일 대응 */
     @media (max-width: 768px) {
         .post-detail-card {
@@ -375,6 +422,24 @@
             min-width: 150px;
             padding: 0.875rem 1.5rem;
             font-size: 1.1rem;
+        }
+        
+        .post-image {
+            border-radius: 8px;
+        }
+        
+        .post-file-section {
+            padding: 1rem;
+        }
+        
+        .btn-download {
+            width: 100%;
+            justify-content: center;
+            padding: 0.875rem 1rem;
+        }
+        
+        .file-name {
+            max-width: 100%;
         }
     }
 </style>
@@ -418,6 +483,25 @@
         <div class="post-content">
             {{ post.content|linebreaks }}
         </div>
+        
+        <!-- 이미지 표시 -->
+        {% if post.image %}
+        <div class="post-image-section mb-4">
+            <img src="{{ post.image.url }}" alt="게시글 이미지" 
+                 class="img-fluid rounded post-image" 
+                 style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+        </div>
+        {% endif %}
+        
+        <!-- 첨부 파일 다운로드 -->
+        {% if post.file %}
+        <div class="post-file-section mb-4">
+            <a href="{{ post.file.url }}" class="btn btn-outline-secondary btn-download" download>
+                <i class="bi bi-file-earmark-arrow-down"></i> 
+                <span class="file-name">{{ post.file.name|slice:"12:" }}</span> 다운로드
+            </a>
+        </div>
+        {% endif %}
 
         <!-- 좋아요 버튼 섹션 -->
         <div class="like-section">

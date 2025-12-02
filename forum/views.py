@@ -83,7 +83,7 @@ def post_detail(request, pk):
 def post_create(request):
     """게시글 작성"""
     if request.method == 'POST':
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -113,7 +113,7 @@ def post_update(request, pk):
         return redirect('forum:post_detail', pk=post.pk)
     
     if request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
+        form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
             # 일반 사용자는 공지사항 작성 불가

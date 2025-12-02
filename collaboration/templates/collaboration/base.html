@@ -43,6 +43,24 @@
                 font-size: 0.85rem !important;
                 padding: 0.5rem 0.5rem !important;
             }
+            
+            /* 게스트 모드 활성화 스타일 조정 */
+            .guest-mode-active {
+                padding: 0.4rem 0.75rem !important;
+                font-size: 0.85rem !important;
+            }
+        }
+        
+        /* 게스트 모드 활성화 스타일 */
+        .guest-mode-active {
+            background-color: #e8f0fe !important;
+            color: #1a73e8 !important;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .guest-mode-active:hover {
+            background-color: #d2e3fc !important;
         }
         
         /* container-fluid 수평 패딩 최소화 - 와이드 레이아웃 */
@@ -113,7 +131,7 @@
                         {% if user.username|slice:":6" == "Guest_" %}
                         <!-- 게스트 사용자일 때 -->
                         <li class="nav-item d-flex align-items-center">
-                            <span class="nav-link text-dark fw-bold d-flex align-items-center" style="font-size: 0.95rem;">
+                            <span class="nav-link text-dark fw-bold d-flex align-items-center guest-mode-active" style="font-size: 0.95rem; background-color: #e8f0fe; color: #1a73e8 !important; border-radius: 8px; padding: 0.5rem 1rem; margin: 0 0.25rem;">
                                 <i class="bi bi-person-check"></i>
                                 <span>게스트 모드</span>
                             </span>

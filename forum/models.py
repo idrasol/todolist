@@ -36,6 +36,18 @@ class Post(models.Model):
         blank=True,
         verbose_name='좋아요'
     )
+    image = models.ImageField(
+        upload_to='forum/images/%Y/%m/%d/',
+        blank=True,
+        null=True,
+        verbose_name='이미지'
+    )
+    file = models.FileField(
+        upload_to='forum/files/%Y/%m/%d/',
+        blank=True,
+        null=True,
+        verbose_name='첨부 파일'
+    )
     
     class Meta:
         verbose_name = '게시글'

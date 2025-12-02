@@ -27,7 +27,7 @@ body {
     font-weight: 400;
     font-size: 1rem;
     line-height: 1.6;
-    padding-top: 70px; /* Navbar 고정에 따른 본문 상단 패딩 */
+    padding-top: 60px; /* Navbar 고정에 따른 본문 상단 패딩 */
 }
 
 /* Navbar - Minimal & Clean (White Theme) */
@@ -125,13 +125,13 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 1rem;
-    padding-top: 5rem; /* 네비게이션 바 높이만큼 상단 패딩 추가 */
+    padding-top: 1rem; /* 네비게이션 바 아래 여백 최소화 */
 }
 
 @media (min-width: 768px) {
     .gemini-main {
-        padding: 3rem 2rem;
-        padding-top: 5rem; /* 네비게이션 바 높이만큼 상단 패딩 추가 */
+        padding: 2rem 2rem;
+        padding-top: 1rem; /* 네비게이션 바 아래 여백 최소화 */
     }
 }
 
@@ -363,7 +363,7 @@ body {
     /* 메인 컨테이너 패딩 축소 */
     .gemini-main {
         padding: 1rem 0.5rem;
-        padding-top: 4rem;
+        padding-top: 0.5rem;
     }
     
     /* 캔버스 내부 패딩 축소 및 터치 최적화 */
@@ -392,5 +392,20 @@ body {
     /* 버튼 패딩 조정 */
     .btn {
         padding: 0.625rem 1rem;
+    }
+    
+    /* 게시판 이미지 및 파일 모바일 최적화 */
+    .post-image {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    .post-file-section {
+        padding: 1rem !important;
+    }
+    
+    .btn-download {
+        width: 100% !important;
+        min-height: 44px;
     }
 }

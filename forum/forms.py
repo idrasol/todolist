@@ -6,7 +6,7 @@ class PostForm(forms.ModelForm):
     """게시글 작성/수정 폼"""
     class Meta:
         model = Post
-        fields = ['title', 'content', 'category', 'is_notice']
+        fields = ['title', 'content', 'category', 'is_notice', 'image', 'file']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -22,13 +22,22 @@ class PostForm(forms.ModelForm):
             }),
             'is_notice': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
+            }),
+            'image': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
+            'file': forms.FileInput(attrs={
+                'class': 'form-control'
             })
         }
         labels = {
             'title': '제목',
             'content': '내용',
             'category': '카테고리',
-            'is_notice': '공지사항'
+            'is_notice': '공지사항',
+            'image': '이미지',
+            'file': '첨부 파일'
         }
 
 
