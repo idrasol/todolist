@@ -191,7 +191,7 @@
         .search-pagination-wrapper {
             gap: 0.5rem;
             align-items: center;
-            flex-wrap: nowrap;
+            flex-wrap: nowrap !important;
             display: flex !important;
             flex-direction: row !important;
             justify-content: space-between !important;
@@ -201,50 +201,70 @@
         
         .search-form {
             flex: 0 0 auto;
-            max-width: 140px;
-            min-width: 110px;
+            max-width: 130px;
+            min-width: 100px;
+            margin: 0;
+        }
+        
+        .search-form .input-group {
+            display: flex;
+            gap: 0;
         }
         
         .search-input {
-            padding: 0.35rem 0.6rem;
+            padding: 0.35rem 0.5rem;
             font-size: 0.7rem;
-            max-width: 110px;
-            min-width: 80px;
+            max-width: 100px;
+            min-width: 70px;
+            flex: 1;
         }
         
         .search-btn {
-            padding: 0.35rem 0.6rem;
+            padding: 0.35rem 0.5rem;
             font-size: 0.7rem;
+            flex-shrink: 0;
         }
         
-        .search-pagination-wrapper > div {
+        .search-pagination-nav {
             flex: 1 1 auto;
             min-width: 0;
             overflow-x: auto;
-            display: flex;
+            display: flex !important;
             justify-content: flex-start;
+            margin: 0;
+            -webkit-overflow-scrolling: touch;
         }
         
         .search-pagination-wrapper .pagination {
-            font-size: 0.7rem;
-            margin: 0;
-            flex-wrap: nowrap;
+            font-size: 0.65rem;
+            margin: 0 !important;
+            flex-wrap: nowrap !important;
+            gap: 0;
         }
         
         .search-pagination-wrapper .page-link {
-            padding: 0.25rem 0.4rem;
-            font-size: 0.7rem;
+            padding: 0.25rem 0.35rem;
+            font-size: 0.65rem;
             white-space: nowrap;
+            line-height: 1.2;
         }
         
         .search-pagination-wrapper .page-item:first-child .page-link,
         .search-pagination-wrapper .page-item:last-child .page-link {
-            padding: 0.25rem 0.35rem;
-            font-size: 0.65rem;
+            padding: 0.25rem 0.3rem;
+            font-size: 0.6rem;
         }
         
         .search-pagination-wrapper .page-item {
             white-space: nowrap;
+            margin: 0;
+        }
+        
+        /* 페이지네이션 스크롤 가능하게 */
+        .search-pagination-wrapper nav {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
         }
     }
     
@@ -617,7 +637,7 @@
             {% endif %}
             <div class="input-group">
                 <input type="text" name="search" class="form-control search-input" 
-                       placeholder="제목, 내용, 작성자로 검색..." 
+                       placeholder="검색..." 
                        value="{{ search_query }}">
                 <button type="submit" class="btn search-btn">
                     <i class="bi bi-search"></i>
@@ -627,8 +647,8 @@
         
         <!-- 페이지네이션 (오른쪽) -->
         {% if page_obj.has_other_pages %}
-        <div class="d-flex justify-content-start flex-grow-1" style="min-width: 0; overflow-x: auto;">
-            <nav aria-label="Page navigation">
+        <div class="d-flex justify-content-start flex-grow-1 search-pagination-nav" style="min-width: 0; overflow-x: auto;">
+            <nav aria-label="Page navigation" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
                 <ul class="pagination justify-content-start mb-0" style="flex-wrap: nowrap;">
             {% if page_obj.has_previous %}
             <li class="page-item">
